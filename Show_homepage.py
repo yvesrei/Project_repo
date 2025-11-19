@@ -1,5 +1,6 @@
+
 def show_homepage():
-    if st.session_state["page"] == "home":
+        
         st.title("FOODMINGLE")
         st.subheader("Where tastes meet!")
         
@@ -18,3 +19,5 @@ def show_homepage():
             else:
                 st.session_state["page"] = "questionnaire"
                 st.rerun()
+
+                
