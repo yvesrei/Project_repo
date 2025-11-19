@@ -1,5 +1,7 @@
 import streamlit as st
 from Show_homepage import show_homepage
+from Questionnaire import show_questionnaire
+
 
 
          
@@ -27,4 +29,3 @@ if st.session_state["page"] == "questionnaire":
     show_questionnaire()
 
 
-    
