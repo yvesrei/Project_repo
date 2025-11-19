@@ -1,16 +1,24 @@
 import streamlit as st
+from Show_homepage import show_homepage
 
 
 st.write("jeay, we connecetd everyhting" \
          
-"")
+# 1. Implement session state
 
-st.button("Click here to start a dinner")
+if "page" not in st.session_state:
+        st.session_state["page"] = "home"
 
-from Feature_01 import return_even
+if "num_of_participants" not in st.session_state:
+        st.session_state["num_of_participants"] = None
+    
+if "current_participant" not in st.session_state:
+        st.session_state["current_participant"] = 1
+    
+if "answers" not in st.session_state:
+        st.session_state["answers"] = []
 
-pist=[i for i in range(10)]
 
-even_list = return_even(pist)
-st.write(even_list)
 
+if st.session_state["page"] == "home":
+    show_homepage()
