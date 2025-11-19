@@ -1,4 +1,4 @@
-
+import streamlit as st
 def show_homepage():
         
         st.title("FOODMINGLE")
@@ -20,4 +20,3 @@ def show_homepage():
                 st.session_state["page"] = "questionnaire"
                 st.rerun()
 
-                
