@@ -29,8 +29,8 @@ def show_questionnaire():
         )
         if st.button("Next Person"):
            
-           st.session_state("answers")=[]
-           st.session_state("answers").append({
+           st.session_state["answers"]=[]
+           st.session_state["answers"].append({
                  "budget": budget,
                  "type_of_cuisine": type_of_cuisine,
                  "dining_style": dining_sytle
