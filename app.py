@@ -31,7 +31,7 @@ if st.session_state["page"] == "questionnaire":
     show_questionnaire()
     
 if st.session_state["page"] == "result":
-    group_taste_profile(x)
+    group_taste_profile()
 
 
 
