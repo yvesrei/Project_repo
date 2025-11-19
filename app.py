@@ -12,4 +12,5 @@ from Feature_01 import return_even
 pist=[i for i in range(10)]
 
 even_list = return_even(pist)
-print(even_list)
+st.write(even_list)
+
