@@ -1,8 +1,15 @@
 import streamlit as st
 
+
 st.write("jeay, we connecetd everyhting" \
          
 "")
 
 st.button("Click here to start a dinner")
 
+from Feature_01.(Questionnaire) import return_even
+
+pist=[i for i in range(10)]
+
+even_list = return_even(pist)
+print(even_list)
