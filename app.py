@@ -2,7 +2,6 @@ import streamlit as st
 from Show_homepage import show_homepage
 
 
-st.write("jeay, we connecetd everyhting" \
          
 # 1. Implement session state
 
