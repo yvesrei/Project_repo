@@ -12,7 +12,7 @@ def show_questionnaire():
             index=None,
             placeholder="Please choose your budget"
         )
-        st.session_state["answers"]=[]
+
         #n dsjhfgewgfw
 
         type_of_cuisine= st.selectbox(
