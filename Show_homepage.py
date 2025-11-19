@@ -14,7 +14,7 @@ def show_homepage():
         st.session_state["num_of_participants"] = num_of_part
         
         if st.button("Set up dinner"):
-            if num_of_part is not None:
+            if num_of_part is None:
                 st.warning("Please select a number of participants for your dinner")
             else:
                 st.session_state["page"] = "questionnaire"
