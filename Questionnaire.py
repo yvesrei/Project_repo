@@ -29,12 +29,23 @@ def show_questionnaire():
         )
         if st.button("Next Person"):
            
+           st.session_state("answers")=[]
+           st.session_state("answers").append({
+                 "budget": budget,
+                 "type_of_cuisine": type_of_cuisine,
+                 "dining_style": dining_sytle
+           })
+                 
+           
            if st.session_state['current_participant'] < st.session_state['num_of_participants']:
                  st.session_state['current_participant'] += 1
                  st.rerun()
            else:
                 st.session_state["page"] = "result"
                 st.rerun()
+                
+        st.write(st.session_state["answers"])
+           
         
        
         
