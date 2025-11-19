@@ -28,8 +28,14 @@ def show_questionnaire():
               placeholder= "Please choose your prefered dining style"
         )
         if st.button("Next Person"):
-           st.session_state["page"] = "result"
-           st.rerun()
+           
+           if st.session_state['current_participant'] < st.session_state['num_of_participants']:
+                 st.session_state['current_participant'] += 1
+                 st.rerun
+                 
+            if st.session_state['current_participant'] == st.session_state['num_of_participants']:
+                 st.session_state["page"] == "result"
+                 st.rerun()
         
        
         
