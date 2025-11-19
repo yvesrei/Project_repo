@@ -23,3 +23,6 @@ if st.session_state["page"] == "home":
     show_homepage()
 
 
+if st.session_state["page"] == "questionnaire":
+    show_questionnaire()
+    
