@@ -4,13 +4,17 @@ def show_questionnaire():
         
         st.title(f"Participant {st.session_state['current_participant']}")
         
-        
+        # fekbrhtgra
+        # hhferhgtb      
         budget = st.selectbox(
             "Your budget preference",
             options=["$","$$","$$$"],
             index=None,
             placeholder="Please choose your budget"
         )
+
+        #n dsjhfgewgfw
+
         type_of_cuisine= st.selectbox(
               "Your cuisine preference",
               options=["italian", "greek", "swiss", "chinese", "thai"],
@@ -28,5 +32,4 @@ def show_questionnaire():
            st.rerun()
         
        
-        # TODO: save answers in session_state
-        # pass
+        
