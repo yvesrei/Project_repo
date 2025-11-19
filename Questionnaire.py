@@ -23,27 +23,33 @@ def show_questionnaire():
         )
         dining_sytle= st.selectbox(
               "Your dining style preference",
-              options=["takeaway","Casual", "A la carte", "Set Menu / Chef's Menu", "Date Night"],
+              options=["Takeaway","Casual", "A la carte", "Set Menu / Chef's Menu", "Date Night"],
               index=None,
               placeholder= "Please choose your prefered dining style"
         )
+
+        st.session_state["answers"]=[]
         if st.button("Next Person"):
            
-           st.session_state["answers"].append({
+           
+                 
+           
+           if st.session_state['current_participant'] < st.session_state['num_of_participants']:
+                 st.session_state['current_participant'] += 1
+
+                 st.session_state["answers"].append({
                  "budget": budget,
                  "type_of_cuisine": type_of_cuisine,
                  "dining_style": dining_sytle
            })
                  
-           
-           if st.session_state['current_participant'] < st.session_state['num_of_participants']:
-                 st.session_state['current_participant'] += 1
                  st.rerun()
+
+
            else:
-                st.session_state["page"] = "result"
+                st.session_state["page"] == "result"
                 st.rerun()
                 
-        st.write(st.session_state["answers"])
            
         
        
