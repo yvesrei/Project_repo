@@ -31,11 +31,10 @@ def show_questionnaire():
            
            if st.session_state['current_participant'] < st.session_state['num_of_participants']:
                  st.session_state['current_participant'] += 1
-                 st.rerun
-                 
-            if st.session_state['current_participant'] == st.session_state['num_of_participants']:
-                 st.session_state["page"] == "result"
                  st.rerun()
+           else:
+                st.session_state["page"] = "result"
+                st.rerun()
         
        
         
