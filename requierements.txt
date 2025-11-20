@@ -1,3 +1,5 @@
 streamlit
 pandas
 random
+numpy
+plotly.graph_objects
