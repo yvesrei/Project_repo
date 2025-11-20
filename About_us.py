@@ -9,7 +9,7 @@ def show_about_us():
 
     # ---- Group section ----
     # Put your group photo in e.g. `images/group_photo.jpg`
-    st.image("images/group_photo.jpg", use_column_width=True, caption="The FOODMINGLE team")
+    st.image("Images/group_photo.jpg", use_column_width=True, caption="The FOODMINGLE team")
 
     st.markdown(
         """
@@ -29,31 +29,31 @@ def show_about_us():
             "name": "Alexander Schön",
             "role": "Coding",
             "email": "alexander.schoen@student.unisg.ch",
-            "image": "images/alexander.jpg",
+            "image": "Images/alexander.jpg",
         },
         {
             "name": "Yves Reichelt",
             "role": "Coding",
             "email": "yves.reichelt@student.unisg.ch",
-            "image": "images/yves.jpg",
+            "image": "Images/yves.jpg",
         },
         {
             "name": "Raphael Loacker",
             "role": "Coding",
             "email": "raphael.loacker@student.unisg.ch",
-            "image": "images/raphael.jpg",
+            "image": "Images/raphael.jpg",
         },
         {
             "name": "Loris Häcki",
             "role": "Presenting",
             "email": "loris.haecki@student.unisg.ch",
-            "image": "images/loris.jpg",
+            "image": "Images/loris.jpg",
         },
         {
             "name": "Ian Pettenhofer",
             "role": "Presenting",
             "email": "ian.pettenhofer@student.unisg.ch",
-            "image": "images/ian.jpg",
+            "image": "Images/ian.jpg",
         },
     ]
 

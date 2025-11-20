@@ -19,4 +19,9 @@ def show_homepage():
             else:
                 st.session_state["page"] = "questionnaire"
                 st.rerun()
-
+        
+        st.write("---")    # <-- MUST be indented 4 spaces
+        
+        if st.button("About us", key="about_button"):   # <-- MUST be indented 4 spaces
+            st.session_state["page"] = "about"
+            st.rerun()
