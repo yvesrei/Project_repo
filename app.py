@@ -2,7 +2,7 @@ import streamlit as st
 from Show_homepage import show_homepage
 from Questionnaire import show_questionnaire
 from spider_chart import group_taste_profile
-
+from About_us import show_about_us
 
 
 
@@ -33,5 +33,6 @@ if st.session_state["page"] == "questionnaire":
 if st.session_state["page"] == "result":
     group_taste_profile()
 
-
+elif st.session_state["page"] == "about":
+    show_about_us()
 
