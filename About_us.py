@@ -27,31 +27,31 @@ def show_about_us():
             "name": "Alexander Schön",
             "role": "Coding",
             "email": "alexander.schoen@student.unisg.ch",
-            "image": "Images/alexander.jpg",
+            "image": "Images/Alexander.jpg",
         },
         {
             "name": "Yves Reichelt",
             "role": "Coding",
             "email": "yves.reichelt@student.unisg.ch",
-            "image": "Images/yves.jpg",
+            "image": "Images/Yves.jpg",
         },
         {
             "name": "Raphael Loacker",
             "role": "Coding",
             "email": "raphael.loacker@student.unisg.ch",
-            "image": "Images/raphael.jpg",
+            "image": "Images/Raphael.jpg",
         },
         {
             "name": "Loris Häcki",
             "role": "Presenting",
             "email": "loris.haecki@student.unisg.ch",
-            "image": "Images/loris.jpg",
+            "image": "Images/Loris.jpg",
         },
         {
             "name": "Ian Pettenhofer",
             "role": "Presenting",
             "email": "ian.pettenhofer@student.unisg.ch",
-            "image": "Images/ian.jpg",
+            "image": "Images/Ian.jpg",
         },
     ]
 
