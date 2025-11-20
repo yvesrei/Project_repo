@@ -66,3 +66,28 @@ def show_about_us():
             st.markdown(f"**{member['name']}**")
             st.write(member["role"])
             st.write(f"[{member['email']}](mailto:{member['email']})")
+
+            # --- Project timeline section ---
+    st.markdown("### Our Journey")
+
+    st.markdown(
+        """
+        **October**
+
+        - **10 October** – Initial idea and first brainstorming session  
+        - **28 October** – Finalized the FOODMINGLE concept and overall structure  
+
+        **November**
+
+        - **7 November** – Split the team into frontend, backend/logic, and presenting roles  
+        - **9–15 November** – Built the basic questionnaire flow and first version of the taste profile logic  
+        - **15–20 November** – Connected the API logic and started mapping restaurant data to cuisines and atmospheres  
+        - **20–25 November** – Integrated the group taste profile with the spider charts and built the first full end-to-end version  
+        - **25 November** – First functioning version of the app  
+        - **26–30 November** – Polished the code, improved the UI, and worked on documentation and the About Us page  
+
+        **December**
+
+        - **1 December** – Final adjustments and finishing touches for the hand-in  
+                """
+            )
