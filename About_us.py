@@ -1,6 +1,4 @@
-# About_us.py
 import streamlit as st
-
 
 
 def show_about_us():

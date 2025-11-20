@@ -34,6 +34,6 @@ if st.session_state["page"] == "questionnaire":
 if st.session_state["page"] == "result":
     group_taste_profile()
 
-if st.session_state["page"] == "about":
+elif st.session_state["page"] == "about":
     show_about_us()
 
