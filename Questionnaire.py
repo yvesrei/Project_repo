@@ -47,7 +47,7 @@ def show_questionnaire():
 
 
            else:
-                st.session_state["page"] == "result"
+                st.session_state["page"] = "result"
                 st.rerun()
                 
            
