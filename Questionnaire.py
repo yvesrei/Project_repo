@@ -33,7 +33,6 @@ def show_questionnaire():
         type_of_cuisine= st.multiselect(
               "Your cuisine preference",
               options=["italian", "greek", "swiss", "chinese", "thai"],
-              index=None,
               placeholder= "Please choose your prefered type of cuisine",
               max_selections=3,
               key=f"type_of_cuisine_{participant}"
