@@ -54,7 +54,7 @@ def show_questionnaire():
               key=f"dining_style_{participant}"
         )
 
-        dining_sytle_importance= st.slider(
+        dining_style_importance= st.slider(
               "How important is the dining style for you?",
               1, 3,
               key=f"dining_style_importance{participant}"
@@ -64,8 +64,11 @@ def show_questionnaire():
            
            st.session_state["answers"].append({
                  "budget": budget,
+                 "budget_importance": budget_importance,
                  "type_of_cuisine": type_of_cuisine,
-                 "dining_style": dining_sytle
+                 "type_of_cuisine_importance": type_of_cuisine_importance,
+                 "dining_style": dining_sytle, 
+                 "dining_style_importance": dining_style_importance
            })
                  
            
