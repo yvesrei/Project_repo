@@ -22,21 +22,42 @@ def show_questionnaire():
             key=f"budget_{participant}"
         )
 
+        budget_importance= st.slider(
+              "How important is the budget for you?",
+              1, 3,
+              key=f"budget_importance{participant}"
+        )
+
         #n dsjhfgewgfw
 
-        type_of_cuisine= st.selectbox(
+        type_of_cuisine= st.multiselect(
               "Your cuisine preference",
               options=["italian", "greek", "swiss", "chinese", "thai"],
               index=None,
               placeholder= "Please choose your prefered type of cuisine",
+              max_selections=3,
               key=f"type_of_cuisine_{participant}"
         )
+
+        type_of_cuisine_importance= st.slider(
+              "How important is the type of cuisine for you?",
+              1, 3,
+              key=f"type_of_cuisine_importance{participant}"
+        )
+
+
         dining_sytle= st.selectbox(
               "Your dining style preference",
               options=["Takeaway","Casual", "A la carte", "Set Menu / Chef's Menu", "Date Night"],
               index=None,
               placeholder= "Please choose your preferred dining style",
               key=f"dining_style_{participant}"
+        )
+
+        dining_sytle_importance= st.slider(
+              "How important is the dining style for you?",
+              1, 3,
+              key=f"dining_style_importance{participant}"
         )
 
         if st.button("Next Person"):
