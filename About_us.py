@@ -55,14 +55,14 @@ def show_about_us():
         },
     ]
 
-    # Layout: 3 columns per row for member cards
-    cols = st.columns(3)
+    # Layout: 2 columns per row for member cards
+    cols = st.columns(2)
 
     for i, member in enumerate(members):
-        col = cols[i % 3]
+        col = cols[i % 2]   # cycle through column 0 and 1
         with col:
             # Individual member image (use placeholder if you don’t have them yet)
-            st.image(member["image"], width=180, caption=member["name"])
+            st.image(member["image"], width=240)
             st.markdown(f"**{member['name']}**")
             st.write(member["role"])
             st.write(f"[{member['email']}](mailto:{member['email']})")
