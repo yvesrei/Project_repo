@@ -25,7 +25,7 @@ def show_questionnaire():
               "Your dining style preference",
               options=["Takeaway","Casual", "A la carte", "Set Menu / Chef's Menu", "Date Night"],
               index=None,
-              placeholder= "Please choose your prefered dining style"
+              placeholder= "Please choose your preferred dining style"
         )
 
         st.session_state["answers"]=[]
