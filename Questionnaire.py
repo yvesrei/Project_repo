@@ -8,7 +8,7 @@ def show_questionnaire():
 
         if f"budget_{participant}" not in st.session_state:
               st.session_state[f"budget_{participant}"] = None
-              st.session_state[f"type_of_cuisine_{participant}"] = None
+              st.session_state[f"type_of_cuisine_{participant}"] = []
               st.session_state[f"dining_style_{participant}"] = None
 
         
