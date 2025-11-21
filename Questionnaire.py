@@ -1,4 +1,6 @@
 import streamlit as st
+from statistics import mode
+
 
 def show_questionnaire():
         
@@ -38,11 +40,18 @@ def show_questionnaire():
               key=f"type_of_cuisine_{participant}"
         )
 
-        type_of_cuisine_importance= st.slider(
-              "How important is the type of cuisine for you?",
-              1, 3,
-              key=f"type_of_cuisine_importance{participant}"
-        )
+        st.markdown("### Rank your selected cuisines (drag to sort):")
+
+        if len(type_of_cuisine) == 3:
+              ranked_cuisines = st.sortable(
+                     type_of_cuisine,
+                     key=f"sortable_{participant}")
+        else:
+             ranked_cuisines = []
+             st.warning("⚠️ You must select exactly 3 cuisines to rank them.")
+             
+
+
 
 
         dining_sytle= st.selectbox(
@@ -60,26 +69,30 @@ def show_questionnaire():
         )
 
         if st.button("Next Person"):
+             
+             if len(type_of_cuisine) != 3:
+                   st.error("❌ You must choose exactly 3 cuisines before continuing.")
+                   st.stop()
            
-           st.session_state["answers"].append({
+             st.session_state["answers"].append({
                  "budget": budget,
                  "budget_importance": budget_importance,
                  "type_of_cuisine": type_of_cuisine,
-                 "type_of_cuisine_importance": type_of_cuisine_importance,
+                 "ranked_cuisines": ranked_cuisines,
                  "dining_style": dining_sytle, 
                  "dining_style_importance": dining_style_importance
            })
                  
            
-           if st.session_state['current_participant'] < st.session_state['num_of_participants']:
+             if st.session_state['current_participant'] < st.session_state['num_of_participants']:
                  st.session_state['current_participant'] += 1
                  
                  st.rerun()
 
 
-           else:
-                st.session_state["page"] = "result"
-                st.rerun()
+             else:
+                   st.session_state["page"] = "result"
+                   st.rerun()
                 
            
         
