@@ -5,3 +5,4 @@ numpy
 plotly.graph_objects
 from statistics import mode
 from collections import Counter
+import plotly.express as px

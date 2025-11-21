@@ -3,6 +3,8 @@ import streamlit as st
 import numpy as np
 from statistics import mode
 from collections import Counter
+import plotly.graph_objects as go
+import plotly.express as px
 
 
 
@@ -84,6 +86,84 @@ def group_taste_profile(answers):
     st.write (f"Your groups prefers:  {most_preferred_cuisine}")
 
     st.write (f"Your group prefers:  {most_common_dining_style}")
+
+
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Budget Preference", budget_symbol_group)
+
+    with col2:
+        st.metric("Top Cuisine", most_preferred_cuisine)
+
+    with col3:
+        st.metric("Dining Style", most_common_dining_style)
+
+    st.markdown("---")
+
+   
+    st.subheader("Importance Distribution (Radar Chart)")
+
+    
+    budget_importance_group = np.mean([p["budget_importance"] for p in answers])
+    cuisine_importance_group = np.mean([p["cuisine_importance"] for p in answers])
+    dining_importance_group = np.mean([p["dining_style_importance"] for p in answers])
+
+    radar_categories = ["Budget Importance", "Cuisine Importance", "Dining Style Importance"]
+    radar_values = [
+        budget_importance_group,
+        cuisine_importance_group,
+        dining_importance_group
+    ]
+
+    fig_radar = go.Figure(
+        data=go.Scatterpolar(
+            r=radar_values,
+            theta=radar_categories,
+            fill='toself'
+        )
+    )
+
+    fig_radar.update_layout(
+        polar=dict(
+            radialaxis=dict(visible=True, range=[0, 3])
+        ),
+        showlegend=False
+    )
+
+    st.plotly_chart(fig_radar)
+
+    st.markdown("---")
+
+ 
+    st.subheader("Cuisine Preference Strength")
+
+    fig_bar = px.bar(
+        x=list(cuisine_scores.values()),
+        y=list(cuisine_scores.keys()),
+        orientation='h',
+        title="Weighted Cuisine Scores",
+        labels={"x": "Score", "y": "Cuisine"},
+    )
+
+    st.plotly_chart(fig_bar)
+
+    st.markdown("---")
+
+    st.subheader("Dining Style Distribution (Weighted)")
+
+    dining_counts = Counter(dining_style_scores)
+
+    fig_pie = px.pie(
+        names=list(dining_counts.keys()),
+        values=list(dining_counts.values()),
+        title="Dining Style Preferences"
+    )
+
+    st.plotly_chart(fig_pie)
+
+    st.markdown("---")
 
 
 
