@@ -62,7 +62,7 @@ def show_questionnaire():
             st.warning("⚠️ You must select exactly 3 cuisines to rank them.")
 
 
-        dining_sytle= st.selectbox(
+        dining_style= st.selectbox(
               "Your dining style preference",
               options=["Takeaway","Casual", "A la carte", "Set Menu / Chef's Menu", "Date Night"],
               index=None,
@@ -105,13 +105,20 @@ def show_questionnaire():
              if len(type_of_cuisine) != 3:
                    st.error("❌ You must choose exactly 3 cuisines before continuing.")
                    st.stop()
+             if budget is None:
+                  st.error("❌ Please select a budget before continuing.")
+                  st.stop()
+             if dining_style is None:
+                  st.error("❌ Please select a dining style before continuing.")
+                  st.stop()
+
            
              st.session_state["answers"].append({
                  "budget": budget,
                  "budget_importance": budget_importance,
                  "type_of_cuisine": type_of_cuisine,
                  "ranked_cuisines": ranked_cuisines,
-                 "dining_style": dining_sytle, 
+                 "dining_style": dining_style, 
                  "dining_style_importance": dining_style_importance
            })
                  
