@@ -69,5 +69,4 @@ def group_taste_profile(answers):
         "cuisine": type_of_cuisine_scores
     }
 
-st.write("answers")
 
