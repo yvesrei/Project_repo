@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 
 
+
 def group_taste_profile(answers):
 
     st.title("This is your groups taste profile of today!")
@@ -57,6 +58,8 @@ def group_taste_profile(answers):
 
         dining_style_scores.extend([dining_style_value] * dining_style_import)
 
+        dining_counts = Counter(dining_style_scores)
+
         most_common_value = mode(dining_style_scores)
 
 
@@ -95,10 +98,9 @@ def group_taste_profile(answers):
 
     st.markdown("---")
 
-   
+ 
     st.subheader("Importance Distribution")
 
-    # group-level average importance for each factor
     budget_importance_group = np.mean([p["budget_importance"] for p in answers])
     cuisine_importance_group = np.mean([p["cuisine_importance"] for p in answers])
     dining_importance_group = np.mean([p["dining_style_importance"] for p in answers])
@@ -110,7 +112,6 @@ def group_taste_profile(answers):
         dining_importance_group,
     ])
 
-    # close the polygon
     angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False)
     stats_closed = np.concatenate((stats, [stats[0]]))
     angles_closed = np.concatenate((angles, [angles[0]]))
@@ -124,10 +125,9 @@ def group_taste_profile(answers):
     ax_radar.set_title("Average Importance (1–3)")
 
     st.pyplot(fig_radar)
-
     st.markdown("---")
 
-   
+
     st.subheader("Cuisine Preference Strength")
 
     fig_bar, ax_bar = plt.subplots()
@@ -139,22 +139,23 @@ def group_taste_profile(answers):
     ax_bar.set_title("Weighted Cuisine Scores")
 
     st.pyplot(fig_bar)
-
     st.markdown("---")
 
-   
+
     st.subheader("Dining Style Distribution (Weighted)")
 
-    fig_pie, ax_pie = plt.subplots()
-    labels_pie = list(dining_counts.keys())
-    sizes_pie = list(dining_counts.values())
-    ax_pie.pie(sizes_pie, labels=labels_pie, autopct="%1.1f%%", startangle=90)
-    ax_pie.axis("equal")
-    ax_pie.set_title("Dining Style Preferences")
+    if len(dining_counts) == 0:
+        st.info("No dining style data available.")
+    else:
+        labels_pie = list(dining_counts.keys())
+        sizes_pie = list(dining_counts.values())
 
-    st.pyplot(fig_pie)
+        fig_pie, ax_pie = plt.subplots()
+        ax_pie.pie(sizes_pie, labels=labels_pie, autopct="%1.1f%%", startangle=90)
+        ax_pie.axis("equal")
+        ax_pie.set_title("Dining Style Preferences")
+        st.pyplot(fig_pie)
 
     st.markdown("---")
-
 
 
