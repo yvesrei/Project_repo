@@ -2,6 +2,7 @@
 import streamlit as st
 import numpy as np
 from statistics import mode
+from collections import Counter
 
 
 
@@ -61,27 +62,28 @@ def group_taste_profile(answers):
         most_common_value = mode(dining_style_scores)
 
 
-    type_of_cuisine_scores = {}
+    most_common_dining_style = Counter(dining_style_scores).most_common(1)[0][0]
+
+
+    cuisine_scores = Counter()
 
     for participant in answers:
-        importance = participant["type_of_cuisine_importance"]
-        cuisines = participant["type_of_cuisine"]
+        ranked_list = participant["ranked_cuisines"]   # >>> CHANGED
 
-        for c in cuisines:
-            if c not in type_of_cuisine_scores:
-                type_of_cuisine_scores[c] = 0
+        for i, cuisine in enumerate(ranked_list):
+            weight = 3 - i
+            cuisine_scores[cuisine] += weight
 
-            type_of_cuisine_scores[c] += 1 * importance
+
+    most_preferred_cuisine = cuisine_scores.most_common(1)[0][0]
 
     
 
     st.write(f"Your group budget preference is:{budget_symbol_group}")
 
-    st.write (f"Your groups prefers: {type_of_cuisine_scores}")
+    st.write (f"Your groups prefers: {most_preferred_cuisine}")
 
-    st.write (f"Your group prefers: {most_common_value}")
-
-
+    st.write (f"Your group prefers: {most_common_dining_style}")
 
 
 
