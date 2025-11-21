@@ -3,11 +3,8 @@ import streamlit as st
 import numpy as np
 from statistics import mode
 from collections import Counter
-import matplotlib.pyplot as plt
-
-
-
-
+import altair as alt
+import pandas as pd
 
 
 def group_taste_profile(answers):
@@ -98,64 +95,74 @@ def group_taste_profile(answers):
 
     st.markdown("---")
 
- 
+    # ----------------------------------------------------
+    # RADAR CHART (Altair version)
+    # ----------------------------------------------------
     st.subheader("Importance Distribution")
 
     budget_importance_group = np.mean([p["budget_importance"] for p in answers])
     cuisine_importance_group = np.mean([p["cuisine_importance"] for p in answers])
     dining_importance_group = np.mean([p["dining_style_importance"] for p in answers])
 
-    labels = np.array(["Budget", "Cuisine", "Dining Style"])
-    stats = np.array([
-        budget_importance_group,
-        cuisine_importance_group,
-        dining_importance_group,
-    ])
+    df_radar = pd.DataFrame({
+        'category': ["Budget", "Cuisine", "Dining Style"],
+        'value': [
+            budget_importance_group,
+            cuisine_importance_group,
+            dining_importance_group
+        ]
+    })
 
-    angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False)
-    stats_closed = np.concatenate((stats, [stats[0]]))
-    angles_closed = np.concatenate((angles, [angles[0]]))
+    radar = alt.Chart(df_radar).mark_area(
+        opacity=0.3
+    ).encode(
+        theta=alt.Theta("category:N", sort=None),
+        radius=alt.Radius("value:Q", scale=alt.Scale(domain=[0,3])),
+        color=alt.value("#4C72B0")
+    )
 
-    fig_radar, ax_radar = plt.subplots(subplot_kw=dict(polar=True))
-    ax_radar.plot(angles_closed, stats_closed)
-    ax_radar.fill(angles_closed, stats_closed, alpha=0.25)
-    ax_radar.set_xticks(angles)
-    ax_radar.set_xticklabels(labels)
-    ax_radar.set_ylim(0, 3)
-    ax_radar.set_title("Average Importance (1–3)")
+    st.altair_chart(radar, use_container_width=True)
 
-    st.pyplot(fig_radar)
     st.markdown("---")
 
-
+    # ----------------------------------------------------
+    # CUISINE BAR CHART (Altair)
+    # ----------------------------------------------------
     st.subheader("Cuisine Preference Strength")
 
-    fig_bar, ax_bar = plt.subplots()
-    cuisines = list(cuisine_scores.keys())
-    values = list(cuisine_scores.values())
-    ax_bar.barh(cuisines, values)
-    ax_bar.set_xlabel("Weighted Score")
-    ax_bar.set_ylabel("Cuisine")
-    ax_bar.set_title("Weighted Cuisine Scores")
+    df_cuisine = pd.DataFrame({
+        "Cuisine": list(cuisine_scores.keys()),
+        "Score": list(cuisine_scores.values())
+    })
 
-    st.pyplot(fig_bar)
+    bar = alt.Chart(df_cuisine).mark_bar().encode(
+        x="Score:Q",
+        y=alt.Y("Cuisine:N", sort='-x'),
+        color=alt.value("#55A868")
+    )
+
+    st.altair_chart(bar, use_container_width=True)
+
     st.markdown("---")
 
-
+    # ----------------------------------------------------
+    # DINING STYLE PIE CHART (Altair)
+    # ----------------------------------------------------
     st.subheader("Dining Style Distribution (Weighted)")
 
     if len(dining_counts) == 0:
         st.info("No dining style data available.")
     else:
-        labels_pie = list(dining_counts.keys())
-        sizes_pie = list(dining_counts.values())
+        df_pie = pd.DataFrame({
+            "Dining Style": list(dining_counts.keys()),
+            "Count": list(dining_counts.values())
+        })
 
-        fig_pie, ax_pie = plt.subplots()
-        ax_pie.pie(sizes_pie, labels=labels_pie, autopct="%1.1f%%", startangle=90)
-        ax_pie.axis("equal")
-        ax_pie.set_title("Dining Style Preferences")
-        st.pyplot(fig_pie)
+        pie = alt.Chart(df_pie).mark_arc().encode(
+            theta="Count:Q",
+            color="Dining Style:N"
+        )
+
+        st.altair_chart(pie, use_container_width=True)
 
     st.markdown("---")
-
-
