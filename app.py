@@ -32,7 +32,7 @@ if st.session_state["page"] == "questionnaire":
     show_questionnaire()
     
 if st.session_state["page"] == "result":
-    group_taste_profile("answers")
+    group_taste_profile()
 
 elif st.session_state["page"] == "about":
     show_about_us()
