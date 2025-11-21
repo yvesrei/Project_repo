@@ -55,10 +55,10 @@ def group_taste_profile(answers):
 
         dining_style_scores.extend([dining_style_value] * dining_style_import)
 
-        dining_counts = Counter(dining_style_scores)
 
-        most_common_value = mode(dining_style_scores)
+    dining_counts = Counter(dining_style_scores)
 
+    most_common_value = mode(dining_style_scores)
 
     most_common_dining_style = Counter(dining_style_scores).most_common(1)[0][0]
 
@@ -101,14 +101,12 @@ def group_taste_profile(answers):
     st.subheader("Importance Distribution")
 
     budget_importance_group = np.mean([p["budget_importance"] for p in answers])
-    cuisine_importance_group = np.mean([p["cuisine_importance"] for p in answers])
     dining_importance_group = np.mean([p["dining_style_importance"] for p in answers])
 
     df_radar = pd.DataFrame({
         'category': ["Budget", "Cuisine", "Dining Style"],
         'value': [
             budget_importance_group,
-            cuisine_importance_group,
             dining_importance_group
         ]
     })
