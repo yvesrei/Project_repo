@@ -1,6 +1,8 @@
 
 import streamlit as st
 import numpy as np
+from statistics import mode
+
 
 
 def group_taste_profile(answers):
@@ -50,6 +52,8 @@ def group_taste_profile(answers):
 
         dining_style_scores.extend([dining_style_value] * dining_style_import)
 
+        most_common_value = mode(dining_style_scores)
+
 
     type_of_cuisine_scores = {}
 
@@ -69,7 +73,7 @@ def group_taste_profile(answers):
 
     st.write (f"Your groups prefers: {type_of_cuisine_scores}")
 
-    st.write (f"Your group prefers: {dining_style_scores}")
+    st.write (f"Your group prefers: {most_common_value}")
 
 
 

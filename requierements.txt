@@ -3,3 +3,4 @@ pandas
 random
 numpy
 plotly.graph_objects
+from statistics import mode

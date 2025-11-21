@@ -1,4 +1,5 @@
 import streamlit as st
+from statistics import mode
 from Show_homepage import show_homepage
 from Questionnaire import show_questionnaire
 from spider_chart import group_taste_profile
