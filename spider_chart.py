@@ -95,16 +95,14 @@ def group_taste_profile(answers):
 
     st.markdown("---")
 
-    # ----------------------------------------------------
-    # RADAR CHART (Altair version)
-    # ----------------------------------------------------
+    
     st.subheader("Importance Distribution")
 
     budget_importance_group = np.mean([p["budget_importance"] for p in answers])
     dining_importance_group = np.mean([p["dining_style_importance"] for p in answers])
 
     df_radar = pd.DataFrame({
-        'category': ["Budget", "Cuisine", "Dining Style"],
+        'category': ["Budget", "Cuisine"],
         'value': [
             budget_importance_group,
             dining_importance_group
@@ -122,10 +120,7 @@ def group_taste_profile(answers):
     st.altair_chart(radar, use_container_width=True)
 
     st.markdown("---")
-
-    # ----------------------------------------------------
-    # CUISINE BAR CHART (Altair)
-    # ----------------------------------------------------
+    
     st.subheader("Cuisine Preference Strength")
 
     df_cuisine = pd.DataFrame({
