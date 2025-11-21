@@ -65,13 +65,13 @@ def group_taste_profile(answers):
 
     
 
-    st.write(f"Your group budget preference is"(group_budget))
+    st.write(f"Your group budget preference is:{group_budget}")
 
-    st.write (f"Your groups prefers"(type_of_cuisine_scores) )
+    st.write (f"Your groups prefers: {type_of_cuisine_scores}")
 
-    st.write(f"Your group prefers" (dining_style_scores))
+    st.write (f"Your group prefers: {dining_style_scores}")
 
-    
+
 
 
 
