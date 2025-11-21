@@ -9,6 +9,18 @@ def group_taste_profile(answers):
 
     st.subheader("Let's analyze it.")
 
+    st.header("Results Summary")
+
+    st.subheader("💸 Budget Preference (1 = $, 3 = $$$)")
+    st.metric("Group Budget Score", round(group_budget, 2))
+
+    st.subheader("🍽️ Dining Style Preference (1 = Takeaway, 5 = Date Night)")
+    st.metric("Group Dining Style Score", round(group_dining_style, 2))
+
+    st.subheader("🌎 Popular Cuisines")
+    for cuisine, score in type_of_cuisine_scores.items():
+        st.write(f"- **{cuisine}**: {score}")
+
     budget_dict = {"$":1, "$$":2, "$$$":3}
 
     budget_scores= []
@@ -63,17 +75,7 @@ def group_taste_profile(answers):
 
             type_of_cuisine_scores[c] += 1 * importance
 
-    st.header("Results Summary")
 
-    st.subheader("💸 Budget Preference (1 = $, 3 = $$$)")
-    st.metric("Group Budget Score", round(group_budget, 2))
-
-    st.subheader("🍽️ Dining Style Preference (1 = Takeaway, 5 = Date Night)")
-    st.metric("Group Dining Style Score", round(group_dining_style, 2))
-
-    st.subheader("🌎 Popular Cuisines")
-    for cuisine, score in type_of_cuisine_scores.items():
-        st.write(f"- **{cuisine}**: {score}")
-        
+    
 
 
