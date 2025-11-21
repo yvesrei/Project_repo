@@ -79,11 +79,11 @@ def group_taste_profile(answers):
 
     
 
-    st.write(f"Your group budget preference is: ** {budget_symbol_group}")
+    st.write(f"Your group budget preference is:  {budget_symbol_group}")
 
-    st.write (f"Your groups prefers: ** {most_preferred_cuisine}")
+    st.write (f"Your groups prefers:  {most_preferred_cuisine}")
 
-    st.write (f"Your group prefers: ** {most_common_dining_style}")
+    st.write (f"Your group prefers:  {most_common_dining_style}")
 
 
 
