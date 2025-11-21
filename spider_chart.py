@@ -11,8 +11,6 @@ def group_taste_profile(answers):
 
     st.header("Results Summary")
 
-    st.subheader("💸 Budget Preference (1 = $, 3 = $$$)")
-    st.metric("Group Budget Score", round(group_budget, 2))
 
 
     budget_dict = {"$":1, "$$":2, "$$$":3}
