@@ -11,6 +11,15 @@ def group_taste_profile(answers):
 
     st.header("Results Summary")
 
+    st.write(f"Your group budget preference is"(group_budget))
+
+    st.write (f"Your groups prefers"(type_of_cuisine_scores) )
+
+    st.write(f"Your group prefers" (dining_style_scores))
+
+
+
+
 
 
     budget_dict = {"$":1, "$$":2, "$$$":3}
@@ -34,26 +43,17 @@ def group_taste_profile(answers):
 
     group_budget = sum(budget_scores) / sum(budget_weights)
 
-    dining_style_dict= {"Takeaway": 1,"Casual": 2, "A la carte": 3, "Set Menu / Chef's Menu": 4, "Date Night": 5}
-
+    
     dining_style_scores= []
-    dining_style_weights=[]
 
     for participant in answers:
         
         dining_style_value= participant["dining_style"]
 
-        numeric_dining_style= dining_style_dict[dining_style_value]
+        dining_style_import = participant["dining_style_importance"]
 
-        dining_style_import= participant["dining_style_importance"]
+        dining_style_scores.extend([dining_style_value] * dining_style_import)
 
-        weighted_dining_style_score= numeric_dining_style * dining_style_import
-
-        dining_style_scores.append(weighted_dining_style_score)
-
-        dining_style_weights.append(dining_style_import)
-
-    group_dining_style = sum(dining_style_scores) / sum(dining_style_weights)
 
     type_of_cuisine_scores = {}
 
@@ -67,7 +67,9 @@ def group_taste_profile(answers):
 
             type_of_cuisine_scores[c] += 1 * importance
 
-
     
+
+
+
 
 
