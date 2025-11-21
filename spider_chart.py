@@ -3,8 +3,9 @@ import streamlit as st
 import numpy as np
 from statistics import mode
 from collections import Counter
-import plotly.graph_objects as go
-import plotly.express as px
+import matplotlib.pyplot as plt
+
+
 
 
 
@@ -15,11 +16,6 @@ def group_taste_profile(answers):
     st.subheader("Let's analyze it.")
 
     st.header("Results Summary")
-
-    
-
-
-
 
 
 
@@ -90,78 +86,73 @@ def group_taste_profile(answers):
 
 
     col1, col2, col3 = st.columns(3)
-
     with col1:
         st.metric("Budget Preference", budget_symbol_group)
-
     with col2:
         st.metric("Top Cuisine", most_preferred_cuisine)
-
     with col3:
         st.metric("Dining Style", most_common_dining_style)
 
     st.markdown("---")
 
    
-    st.subheader("Importance Distribution (Radar Chart)")
+    st.subheader("Importance Distribution")
 
-    
+    # group-level average importance for each factor
     budget_importance_group = np.mean([p["budget_importance"] for p in answers])
     cuisine_importance_group = np.mean([p["cuisine_importance"] for p in answers])
     dining_importance_group = np.mean([p["dining_style_importance"] for p in answers])
 
-    radar_categories = ["Budget Importance", "Cuisine Importance", "Dining Style Importance"]
-    radar_values = [
+    labels = np.array(["Budget", "Cuisine", "Dining Style"])
+    stats = np.array([
         budget_importance_group,
         cuisine_importance_group,
-        dining_importance_group
-    ]
+        dining_importance_group,
+    ])
 
-    fig_radar = go.Figure(
-        data=go.Scatterpolar(
-            r=radar_values,
-            theta=radar_categories,
-            fill='toself'
-        )
-    )
+    # close the polygon
+    angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False)
+    stats_closed = np.concatenate((stats, [stats[0]]))
+    angles_closed = np.concatenate((angles, [angles[0]]))
 
-    fig_radar.update_layout(
-        polar=dict(
-            radialaxis=dict(visible=True, range=[0, 3])
-        ),
-        showlegend=False
-    )
+    fig_radar, ax_radar = plt.subplots(subplot_kw=dict(polar=True))
+    ax_radar.plot(angles_closed, stats_closed)
+    ax_radar.fill(angles_closed, stats_closed, alpha=0.25)
+    ax_radar.set_xticks(angles)
+    ax_radar.set_xticklabels(labels)
+    ax_radar.set_ylim(0, 3)
+    ax_radar.set_title("Average Importance (1–3)")
 
-    st.plotly_chart(fig_radar)
+    st.pyplot(fig_radar)
 
     st.markdown("---")
 
- 
+   
     st.subheader("Cuisine Preference Strength")
 
-    fig_bar = px.bar(
-        x=list(cuisine_scores.values()),
-        y=list(cuisine_scores.keys()),
-        orientation='h',
-        title="Weighted Cuisine Scores",
-        labels={"x": "Score", "y": "Cuisine"},
-    )
+    fig_bar, ax_bar = plt.subplots()
+    cuisines = list(cuisine_scores.keys())
+    values = list(cuisine_scores.values())
+    ax_bar.barh(cuisines, values)
+    ax_bar.set_xlabel("Weighted Score")
+    ax_bar.set_ylabel("Cuisine")
+    ax_bar.set_title("Weighted Cuisine Scores")
 
-    st.plotly_chart(fig_bar)
+    st.pyplot(fig_bar)
 
     st.markdown("---")
 
+   
     st.subheader("Dining Style Distribution (Weighted)")
 
-    dining_counts = Counter(dining_style_scores)
+    fig_pie, ax_pie = plt.subplots()
+    labels_pie = list(dining_counts.keys())
+    sizes_pie = list(dining_counts.values())
+    ax_pie.pie(sizes_pie, labels=labels_pie, autopct="%1.1f%%", startangle=90)
+    ax_pie.axis("equal")
+    ax_pie.set_title("Dining Style Preferences")
 
-    fig_pie = px.pie(
-        names=list(dining_counts.keys()),
-        values=list(dining_counts.values()),
-        title="Dining Style Preferences"
-    )
-
-    st.plotly_chart(fig_pie)
+    st.pyplot(fig_pie)
 
     st.markdown("---")
 
