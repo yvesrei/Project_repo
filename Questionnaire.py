@@ -60,6 +60,15 @@ def show_questionnaire():
         else:
             ranked_cuisines = []
             st.warning("⚠️ You must select exactly 3 cuisines to rank them.")
+
+
+        dining_sytle= st.selectbox(
+              "Your dining style preference",
+              options=["Takeaway","Casual", "A la carte", "Set Menu / Chef's Menu", "Date Night"],
+              index=None,
+              placeholder= "Please choose your preferred dining style",
+              key=f"dining_style_{participant}"
+        )
         
         st.markdown("### Importance of the three factors (use 1, 2, 3 once each)")
 
@@ -87,13 +96,7 @@ def show_questionnaire():
 
 
 
-        dining_sytle= st.selectbox(
-              "Your dining style preference",
-              options=["Takeaway","Casual", "A la carte", "Set Menu / Chef's Menu", "Date Night"],
-              index=None,
-              placeholder= "Please choose your preferred dining style",
-              key=f"dining_style_{participant}"
-        )
+        
 
         
 
