@@ -24,11 +24,7 @@ def show_questionnaire():
             key=f"budget_{participant}"
         )
 
-        budget_importance= st.slider(
-              "How important is the budget for you?",
-              1, 3,
-              key=f"budget_importance{participant}"
-        )
+        
 
         #n dsjhfgewgfw
 
@@ -64,7 +60,29 @@ def show_questionnaire():
         else:
             ranked_cuisines = []
             st.warning("⚠️ You must select exactly 3 cuisines to rank them.")
+        
+        st.markdown("### Importance of the three factors (use 1, 2, 3 once each)")
 
+        budget_importance = st.selectbox(
+        "Importance of BUDGET",
+        [1, 2, 3],
+        key=f"budget_importance_{participant}"
+    )
+
+    
+        remaining_after_budget = [v for v in [1, 2, 3] if v != budget_importance]
+
+        cuisine_importance = st.selectbox(
+             "Importance of CUISINE",
+             remaining_after_budget,
+             key=f"cuisine_importance_{participant}"
+             )
+
+   
+        dining_style_importance = [v for v in [1, 2, 3]
+                                   if v not in [budget_importance, cuisine_importance]][0]
+
+        st.write(f"Importance of DINING STYLE: **{dining_style_importance}** (auto-assigned)")
 
 
 
@@ -77,11 +95,7 @@ def show_questionnaire():
               key=f"dining_style_{participant}"
         )
 
-        dining_style_importance= st.slider(
-              "How important is the dining style for you?",
-              1, 3,
-              key=f"dining_style_importance{participant}"
-        )
+        
 
         if st.button("Next Person"):
              
