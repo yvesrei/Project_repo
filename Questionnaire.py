@@ -37,19 +37,34 @@ def show_questionnaire():
               options=["italian", "greek", "swiss", "chinese", "thai"],
               placeholder= "Please choose your prefered type of cuisine",
               max_selections=3,
-              key=f"type_of_cuisine_{participant}"
-        )
-
-        st.markdown("### Rank your selected cuisines (drag to sort):")
+              key=f"type_of_cuisine_{participant}")
+              
+              
+        st.markdown("### Rank your selected cuisines (1 = most preferred):")
 
         if len(type_of_cuisine) == 3:
-              ranked_cuisines = st.sortable(
-                     type_of_cuisine,
-                     key=f"sortable_{participant}")
+            rank1 = st.selectbox(
+                   "Rank 1 (most preferred)",
+                   type_of_cuisine,
+                   key=f"rank1_{participant}"
+                   )
+                   
+            rank2_options = [c for c in type_of_cuisine if c != rank1]
+            rank2 = st.selectbox(
+                   "Rank 2",
+                   rank2_options,
+                   key=f"rank2_{participant}"
+                   )
+
+            rank3 = [c for c in rank2_options if c != rank2][0]
+            st.write(f"Rank 3: {rank3}")
+            
+            ranked_cuisines = [rank1, rank2, rank3]
+
         else:
-             ranked_cuisines = []
-             st.warning("⚠️ You must select exactly 3 cuisines to rank them.")
-             
+            ranked_cuisines = []
+            st.warning("⚠️ You must select exactly 3 cuisines to rank them.")
+
 
 
 
@@ -83,7 +98,7 @@ def show_questionnaire():
                  "dining_style_importance": dining_style_importance
            })
                  
-           
+            
              if st.session_state['current_participant'] < st.session_state['num_of_participants']:
                  st.session_state['current_participant'] += 1
                  
