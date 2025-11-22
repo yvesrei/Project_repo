@@ -9,6 +9,7 @@ import pandas as pd
 
 def group_taste_profile(answers):
 
+    # Titlle and headers for the result summary
     st.title("This is your groups taste profile of today!")
 
     st.subheader("Let's analyze it.")
@@ -16,11 +17,18 @@ def group_taste_profile(answers):
     st.header("Results Summary")
 
 
+    # Created a dictionary to convert the budget answers into numeric Values example: "$" --> 1.
 
     budget_dict = {"$":1, "$$":2, "$$$":3}
 
+   # Create empty lists to store interim results.
+
     budget_scores= []
     budget_weights=[]
+
+
+    ## For each participant their numeric budget value gets multiplied by their importance value.
+    # This gives more weight to the answers of participants who chose to give their budget preference more weight.
 
     for participant in answers:
         
@@ -36,7 +44,11 @@ def group_taste_profile(answers):
 
         budget_weights.append(budget_import)
 
+    # Calculates the weighted group averagre result of the group budget value.
+
     group_budget = sum(budget_scores) / sum(budget_weights)
+
+    ## Rounds the weigthed group value to the nearest whole number and converts it back into "$, $$, $$$".
 
     rounded_budget= round(group_budget)
 
@@ -45,7 +57,13 @@ def group_taste_profile(answers):
     budget_symbol_group = reverse_budget_dict.get(rounded_budget, "Unknown")
 
     
+    # Empty list gets created to store the dining_style scores.
+
     dining_style_scores= []
+
+    # For each participant the chosen dining style gets muplitplied by the chosen importance for that style.
+    # Then the list gets extended with the dining style times the importance value.
+    # Example: Casual (importance = 2) --> "Casual" gets addded 2 times in the list.
 
     for participant in answers:
         
@@ -55,10 +73,11 @@ def group_taste_profile(answers):
 
         dining_style_scores.extend([dining_style_value] * dining_style_import)
 
+    # Counts how many times each dining style appears (after weighting).
 
     dining_counts = Counter(dining_style_scores)
 
-    most_common_value = mode(dining_style_scores)
+    # Gives us the weighted most common dining style of the list, by selecting the first one == the most common one.
 
     most_common_dining_style = Counter(dining_style_scores).most_common(1)[0][0]
 
@@ -76,14 +95,6 @@ def group_taste_profile(answers):
     most_preferred_cuisine = cuisine_scores.most_common(1)[0][0]
 
     
-
-    st.write(f"Your group budget preference is:  {budget_symbol_group}")
-
-    st.write (f"Your groups prefers:  {most_preferred_cuisine}")
-
-    st.write (f"Your group prefers:  {most_common_dining_style}")
-
-
 
     col1, col2, col3 = st.columns(3)
     with col1:
