@@ -4,9 +4,17 @@ from statistics import mode
 
 def show_questionnaire():
         
+        ## Title displays which participant is currently answering the questionnaire.
         st.title(f"Participant {st.session_state['current_participant']}")
 
         participant=st.session_state['current_participant']
+        
+
+        ## Initializes for each participant the fields the first time they appear.
+        # These per-participant keys ensure that answers from previous participant. 
+        # are not shown again. Each participant has their own widget keys for example
+        # "budget_1", so Streamlit loads a fresh, empty state.
+
 
         if f"budget_{participant}" not in st.session_state:
               st.session_state[f"budget_{participant}"] = None
@@ -14,8 +22,10 @@ def show_questionnaire():
               st.session_state[f"dining_style_{participant}"] = None
 
         
-        # fekbrhtgra
-        # hhferhgtb      
+        # In this button each participant can choose his budget preference and
+        # it gets stored in his personal key.
+        
+
         budget = st.selectbox(
             "Your budget preference",
             options=["$","$$","$$$"],
@@ -24,9 +34,11 @@ def show_questionnaire():
             key=f"budget_{participant}"
         )
 
-        
 
-        #n dsjhfgewgfw
+        # This is a multiselect button, eg. the participant is able to choose 3 different type if cuisines.
+        # The maximum number of selected types of cuisines is set to 3.
+        # Gets stored in the personal key.
+        # The ranking section only activates if exactly 3 cuisines have been selected.
 
         type_of_cuisine= st.multiselect(
               "Your cuisine preference",
@@ -37,6 +49,11 @@ def show_questionnaire():
               
               
         st.markdown("### Rank your selected cuisines (1 = most preferred):")
+
+        ## Ranking logic of the 3 selcted cuisines.
+        # The participant must rank his selected cuisines manually.
+        # Ranks are linked to each other. So Rank 2 options exclude the one chosen in rank 1.
+        # Rank 3 is auto assigned with what is left--> ensure that every rank is used.
 
         if len(type_of_cuisine) == 3:
             rank1 = st.selectbox(
@@ -61,6 +78,10 @@ def show_questionnaire():
             ranked_cuisines = []
             st.warning("⚠️ You must select exactly 3 cuisines to rank them.")
 
+        
+        ## Selectbox where participant decides his preferred dining style.
+        # Stored as well in a specific participant key.
+
 
         dining_style= st.selectbox(
               "Your dining style preference",
@@ -72,14 +93,21 @@ def show_questionnaire():
         
         st.markdown("### Importance of the three factors (use 1, 2, 3 once each)")
 
+
+        ## The importance ranking system
+        # Each factor (budget, cuisine, dining style) must receive a unique importance value (1, 2, 3).
+        # Each participant chooses 1–3 for budget, then the remaining values for cuisine,
+        # and the final value is automatically assigned to dining style. Same logic as before in the cuisine part.
+
+
         budget_importance = st.selectbox(
         "Importance of BUDGET",
         [1, 2, 3],
         key=f"budget_importance_{participant}"
     )
-
-    
+        
         remaining_after_budget = [v for v in [1, 2, 3] if v != budget_importance]
+
 
         cuisine_importance = st.selectbox(
              "Importance of CUISINE",
@@ -91,14 +119,16 @@ def show_questionnaire():
         dining_style_importance = [v for v in [1, 2, 3]
                                    if v not in [budget_importance, cuisine_importance]][0]
 
+
         st.write(f"Importance of DINING STYLE: **{dining_style_importance}** (auto-assigned)")
 
 
+        ## This button performs at first the validation with the check if the participant has selected all valid answers. 
+        # If not it displays an error-message with the problem, and what the participant has to do.
+        # Then the answers of the participant get saved in "answers".
+        # If everything was correct and the answers were stored it moves to the next participant or 
+        # if all participants have completed the questionnaire it moves to the result page.
 
-
-        
-
-        
 
         if st.button("Next Person"):
              
@@ -134,6 +164,6 @@ def show_questionnaire():
                    st.rerun()
                 
            
-        
+
        
         
