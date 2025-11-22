@@ -148,6 +148,7 @@ def show_questionnaire():
                  "budget_importance": budget_importance,
                  "type_of_cuisine": type_of_cuisine,
                  "ranked_cuisines": ranked_cuisines,
+                 "cuisine_importance": cuisine_importance,
                  "dining_style": dining_style, 
                  "dining_style_importance": dining_style_importance
            })
