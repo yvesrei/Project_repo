@@ -81,7 +81,9 @@ def group_taste_profile(answers):
 
     most_common_dining_style = Counter(dining_style_scores).most_common(1)[0][0]
 
-
+    # Counts the rank of the cuisine choices of the participants.
+    # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
+    
     cuisine_scores = Counter()
 
     for participant in answers:
@@ -170,3 +172,4 @@ def group_taste_profile(answers):
         st.altair_chart(pie, use_container_width=True)
 
     st.markdown("---")
+
