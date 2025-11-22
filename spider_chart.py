@@ -83,7 +83,7 @@ def group_taste_profile(answers):
 
     # Counts the rank of the cuisine choices of the participants.
     # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
-    
+    # And gets the cuisine that has got the most points and stores it in "most_preferred_cuisine".
     cuisine_scores = Counter()
 
     for participant in answers:
@@ -97,7 +97,7 @@ def group_taste_profile(answers):
     most_preferred_cuisine = cuisine_scores.most_common(1)[0][0]
 
     
-
+    # Summary metrics --> shows the three group Values in boxes.
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Budget Preference", budget_symbol_group)
@@ -111,29 +111,39 @@ def group_taste_profile(answers):
     
     st.subheader("Importance Distribution")
 
+
     budget_importance_group = np.mean([p["budget_importance"] for p in answers])
-    dining_importance_group = np.mean([p["dining_style_importance"] for p in answers])
+    cuisine_importance_group = np.mean([p["cuisine_importance"] for p in answers])
+    dining_importance_group  = np.mean([p["dining_style_importance"] for p in answers])
+
 
     df_radar = pd.DataFrame({
-        'category': ["Budget", "Cuisine"],
-        'value': [
-            budget_importance_group,
-            dining_importance_group
+    "category": ["Budget", "Cuisine", "Dining Style"],
+    "value": [
+        budget_importance_group,
+        cuisine_importance_group,
+        dining_importance_group
         ]
-    })
+        })
 
-    radar = alt.Chart(df_radar).mark_area(
-        opacity=0.3
-    ).encode(
-        theta=alt.Theta("category:N", sort=None),
-        radius=alt.Radius("value:Q", scale=alt.Scale(domain=[0,3])),
-        color=alt.value("#4C72B0")
+
+    chart = alt.Chart(df_radar).mark_bar().encode(
+    x=alt.X("category:N", title="Category"),
+    y=alt.Y("value:Q", title="Average Importance (1–3)"),
+    color=alt.Color("category:N")
     )
 
-    st.altair_chart(radar, use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
 
     st.markdown("---")
-    
+
+
+    ## This code block visualizes the weighted cuisine scores as a bar chart.
+    # We first convert the cuisine_scores counter into a dataframe so Altair can read the data init.
+    # Each bar then represents one cuisine and how many points it received in total.
+    # Sorted from most points to least points.
+
+
     st.subheader("Cuisine Preference Strength")
 
     df_cuisine = pd.DataFrame({
