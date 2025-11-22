@@ -183,7 +183,7 @@ def group_taste_profile(answers):
 
     st.markdown("---")
 
-if st.button("Find matching Restaurants!"):
-    st.session_state["page"] = "api"
-    st.rerun()
-    
+    if st.button("Find matching Restaurants!"):
+        st.session_state["page"] = "api"
+        st.rerun()
+
