@@ -5,6 +5,8 @@ from statistics import mode
 from collections import Counter
 import altair as alt
 import pandas as pd
+from sklearn.cluster import KMeans
+
 
 
 
