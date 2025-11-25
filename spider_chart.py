@@ -708,11 +708,6 @@ def group_taste_profile(answers):
         with colg3:
             st.metric("Dining Style", details["main_dining_style"])
 
-        # Show cluster sizes across all saved dinners
-        counts = Counter(labels)
-        st.caption("Cluster distribution across all saved dinners:")
-        for cid, count in sorted(counts.items()):
-            st.caption(f"- Cluster {cid + 1}: {count} dinner(s)")
 
         # Store for other pages (e.g. API page)
         st.session_state["current_group_cluster_id"] = int(current_label)
