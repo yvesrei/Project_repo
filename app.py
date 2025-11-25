@@ -7,17 +7,21 @@ from About_us import show_about_us
 from api_client import api_access
 
 
+# Display restaurant matches based on stored group results from spider web
 def show_api_results():
-    # Make sure we have the group results from spider_chart
+
+    # Stop if required data from previous steps is missing
     if "group_budget_numeric" not in st.session_state or "group_cuisine" not in st.session_state:
         st.error("Please go through the questionnaire and results page first.")
         return
 
+    # Page title for the restaurant results view
     st.title("Matching Restaurants in Zürich!")
 
     # Call the Yelp API via api_access()
+    # Fetch matching restaurants from the Yelp API based on group budget and cuisine
     results = api_access(
-        latitude=47.3769,   # ignored internally, we always use Zurich in api_client
+        latitude=47.3769,   # ignored, by now we ONLY use ZURICH in api_client
         longitude=8.5417,
         open_at=1700000000,
         radius=2000,
@@ -25,10 +29,13 @@ def show_api_results():
         cuisine=st.session_state["group_cuisine"]
     )
 
+    # Handle the case where no restaurants are returned
     if not results:
         st.warning("No restaurants found even after relaxing filters.")
         return
 
+    # Display each restaurant's key information to the user, including name, rarting, address, phone, 
+    # website, opening hours, and menu URL
     for r in results:
         st.subheader(r["name"])
 
@@ -54,52 +61,86 @@ def show_api_results():
         st.markdown("---")
 
 
-
-         
-## 1. Implement session state
-# The Streamlit app reruns on every interaction, so we use:
-# st.session_state to remember values between reruns.
-# "page" controls which screen the user is on
-# "num_of_participants" shows how many people will attend the dinner --> answer the questionnaire
-# "current_participant"  --> Tracks which participant is currently filling out the questionnaire
-# "answers" is the list in which each participants answers are stored
+# --- 1. Session state initialization ---
+# Streamlit reruns the script on every interaction. We use st.session_state
+# to persist values across reruns so we know:
+# - which page the user is on,
+# - how many participants there are,
+# - which participant is currently answering,
+# - and all collected answers so far.
 
 if "page" not in st.session_state:
-        st.session_state["page"] = "home"
-
+    # First run: start the user on the home page.
+    st.session_state["page"] = "home"
+else:
+    # Later runs: keep the current page value so navigation is stable.
+    pass
 
 if "num_of_participants" not in st.session_state:
-        st.session_state["num_of_participants"] = None
-
+    # Stores the total number of people who will answer the questionnaire.
+    # Initially unknown, so set it to None until the user enters it.
+    st.session_state["num_of_participants"] = None
+else:
+    # Once set on the home page, this value is reused across pages.
+    pass
 
 if "current_participant" not in st.session_state:
-        st.session_state["current_participant"] = 1
-
+    # Tracks which participant is currently filling out the questionnaire.
+    # We start counting at 1 for the first participant.
+    st.session_state["current_participant"] = 1
+else:
+    # This counter is typically incremented when one participant finishes.
+    pass
 
 if "answers" not in st.session_state:
-        st.session_state["answers"] = []
+    # List that holds one answer dictionary per participant.
+    # Each element should contain that participant's responses.
+    st.session_state["answers"] = []
+else:
+    # On reruns, we keep all previously collected answers intact.
+    pass
 
-## This block controls the page navigation in the app
-# Depending on the value stored in st.session_state["page"],
-# the corresponding screen is displayed through accessing the function
 
-if st.session_state["page"] == "home":
+# --- 2. Page navigation (router) ---
+# The "page" key in session_state acts as a simple router.
+# Depending on its value, we call exactly one view function.
+# Other parts of the app (buttons, etc.) update st.session_state["page"]
+# to switch between screens.
+
+page = st.session_state.get("page", "home")
+
+if page == "home":
+    # Home screen:
+    # - Introduces the app
+    # - Asks for number of participants
+    # - Provides entry point into the questionnaire flow
     show_homepage()
 
-
-if st.session_state["page"] == "questionnaire":
+elif page == "questionnaire":
+    # Questionnaire screen:
+    # - Collects answers for the current participant
+    # - Uses current_participant and num_of_participants from session_state
     show_questionnaire()
 
-
-if st.session_state["page"] == "result":
+elif page == "result":
+    # Result screen:
+    # - Aggregates all participants' answers
+    # - Computes and displays the group taste profile
     group_taste_profile(st.session_state["answers"])
 
-
-if st.session_state["page"] == "api":
+elif page == "api":
+    # API results screen:
+    # - Uses the computed group profile (budget, cuisine)
+    # - Calls the external API (e.g. Yelp) and displays matching restaurants
     show_api_results()
-      
 
-
-elif st.session_state["page"] == "about":
+elif page == "about":
+    # About screen:
+    # - Static information about the app, authors, or context
     show_about_us()
 
+else:
+    # Fallback for invalid / unexpected page values:
+    # - Reset to home to avoid the app breaking on a bad state
+    st.session_state["page"] = "home"
+    show_homepage()
