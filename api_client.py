@@ -154,10 +154,6 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         "limit": 20,
     }
 
-    # If open_at is provided, actually pass it through to Yelp while keeping the original comment.
-    if open_at is not None:
-        params["open_at"] = open_at
-
     # First attempt: strict search using both cuisine and price filters
     businesses = search(params)
 

@@ -27,7 +27,7 @@ def show_api_results():
         radius=2000,
         budget_level=st.session_state["group_budget_numeric"],
         cuisine=st.session_state["group_cuisine"],
-        open_at=1700000000,  # you can still use your fixed timestamp if you like
+        # open_at is omitted – time-based filtering disabled
     )
 
     # Handle the case where no restaurants are returned
