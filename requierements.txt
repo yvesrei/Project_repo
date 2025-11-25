@@ -1,9 +1,8 @@
 streamlit
 pandas
-random
 numpy
-import matplotlib.pyplot as plt
-from statistics import mode
-from collections import Counter
+matplotlib
+altair
+requests
 scikit-learn
 
