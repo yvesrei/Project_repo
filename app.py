@@ -7,7 +7,34 @@ from About_us import show_about_us
 from api_client import api_access
 
 
+def show_api_results():
+    # Make sure we have the group results from spider_chart
+    if "group_budget_numeric" not in st.session_state or "group_cuisine" not in st.session_state:
+        st.error("Please go through the questionnaire and results page first.")
+        return
 
+    st.title("Matching Restaurants")
+
+    # 👉 Call the Yelp API via api_access()
+    results = api_access(
+        latitude=47.3769,                            # TODO: replace with real latitude
+        longitude=8.5417,                            # TODO: replace with real longitude
+        open_at=1700000000,                          # TODO: real timestamp (Unix)
+        radius=2000,                                 # in meters
+        budget_level=st.session_state["group_budget_numeric"],
+        cuisine=st.session_state["group_cuisine"]
+    )
+
+    if not results:
+        st.warning("No restaurants found for these preferences.")
+        return
+
+    for r in results:
+        st.write(f"### {r['name']}")
+        st.write(f"⭐ Rating: {r['rating']}")
+        st.write(f"💲 Price: {r['price']}")
+        st.write(f"🍽 Categories: {', '.join(r['categories'])}")
+        st.markdown("---")
 
 
          
@@ -49,8 +76,9 @@ if st.session_state["page"] == "questionnaire":
 if st.session_state["page"] == "result":
     group_taste_profile(st.session_state["answers"])
 
+
 if st.session_state["page"] == "api":
-      api_access()
+    show_api_results()
       
 
 

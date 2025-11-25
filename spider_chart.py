@@ -57,6 +57,8 @@ def group_taste_profile(answers):
 
     budget_symbol_group = reverse_budget_dict.get(rounded_budget, "Unknown")
 
+    st.session_state["group_budget_numeric"] = str(rounded_budget)
+
     
     # Empty list gets created to store the dining_style scores.
 
@@ -81,6 +83,8 @@ def group_taste_profile(answers):
     # Gives us the weighted most common dining style of the list, by selecting the first one == the most common one.
 
     most_common_dining_style = Counter(dining_style_scores).most_common(1)[0][0]
+
+    st.session_state["group_cuisine"] = most_preferred_cuisine.lower()
 
     # Counts the rank of the cuisine choices of the participants.
     # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
@@ -187,4 +191,3 @@ def group_taste_profile(answers):
     if st.button("Find matching Restaurants!"):
         st.session_state["page"] = "api"
         st.rerun()
-
