@@ -4,6 +4,10 @@ import requests
     
 API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApBVkLwVfkNqR0v6X9K8DcuyqZBycjrPixxx9-DQen0SeR0Qp2yjaTD4UlaXYx"
 
+# Coordinates for Zurich (BY NOW we ONLY search around this location)
+ZURICH_LAT = 47.3769
+ZURICH_LON = 8.5417
+
 # We now  support the 9 biggest Swiss cities (by population) as search centers,
 # using their main train station or an equivalent central point as the reference
 # for the radius feature. Multiple common spellings are mapped to the same coords.
