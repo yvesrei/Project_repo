@@ -5,6 +5,5 @@ matplotlib
 altair
 requests
 scikit-learn
-pathlib
-csv
+
 
