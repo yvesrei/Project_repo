@@ -338,6 +338,22 @@ def cluster_group_profiles():
         except Exception as e:
             st.warning(f"Could not read group profiles file: {e}")
 
+    # 🔴 NEW: if file exists but has too few rows (e.g. only 1),
+    # top it up with synthetic profiles so we have at least 50 total.
+    if len(vectors_list) < 50:
+        needed = 50 - len(vectors_list)
+        synthetic_extra = generate_synthetic_group_profiles(n=needed)
+        vectors_list.extend(synthetic_extra)
+
+        # Also append these extra ones to the CSV so it stays in sync
+        try:
+            with DATA_FILE.open("a", newline="") as f:
+                writer = csv.writer(f)
+                for vec in synthetic_extra:
+                    writer.writerow(vec)
+        except Exception as e:
+            st.warning(f"Could not extend group profiles file: {e}")
+
     if len(vectors_list) == 0:
         return None, None, None
 
@@ -360,6 +376,7 @@ def cluster_group_profiles():
 
     current_group_label = int(labels[-1])  # last = current dinner
     return labels, centers, current_group_label
+
 
 
 
