@@ -13,28 +13,46 @@ def show_api_results():
         st.error("Please go through the questionnaire and results page first.")
         return
 
-    st.title("Matching Restaurants")
+    st.title("Matching Restaurants in Zürich")
 
-    # 👉 Call the Yelp API via api_access()
+    # Call the Yelp API via api_access()
     results = api_access(
-        latitude = 47.3769,                          # TODO: replace with real latitude
-        longitude=8.5417,                            # TODO: replace with real longitude
-        open_at=1700000000,                          # TODO: real timestamp (Unix)
-        radius=2000,                                 # in meters
+        latitude=47.3769,   # ignored internally, we always use Zurich in api_client
+        longitude=8.5417,
+        open_at=1700000000,
+        radius=2000,
         budget_level=st.session_state["group_budget_numeric"],
         cuisine=st.session_state["group_cuisine"]
     )
 
     if not results:
-        st.warning("No restaurants found for these preferences.")
+        st.warning("No restaurants found even after relaxing filters.")
         return
 
     for r in results:
-        st.write(f"### {r['name']}")
-        st.write(f"⭐ Rating: {r['rating']}")
-        st.write(f"💲 Price: {r['price']}")
-        st.write(f"🍽 Categories: {', '.join(r['categories'])}")
+        st.subheader(r["name"])
+
+        if r["rating"] is not None:
+            st.write(f"⭐ {r['rating']} / 5")
+
+        if r["address"]:
+            st.write(r["address"])
+
+        if r["phone"]:
+            st.write(f"📞 {r['phone']}")
+
+        if r["website"]:
+            st.markdown(f"[Website]({r['website']})")
+
+        if r["opening_hours"]:
+            st.write("🕒 Opening hours:")
+            st.text(r["opening_hours"])  # preserves line breaks
+
+        if r["menu_url"]:
+            st.markdown(f"[Menu]({r['menu_url']})")
+
         st.markdown("---")
+
 
 
          
