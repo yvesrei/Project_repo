@@ -700,13 +700,7 @@ def group_taste_profile(answers):
         )
         st.write(explanation)
 
-        colg1, colg2, colg3 = st.columns(3)
-        with colg1:
-            st.metric("Typical Budget", details["budget_level"])
-        with colg2:
-            st.metric("Key Cuisine", details["main_cuisine"].capitalize())
-        with colg3:
-            st.metric("Dining Style", details["main_dining_style"])
+    
 
 
         # Store for other pages (e.g. API page)
