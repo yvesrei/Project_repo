@@ -4,17 +4,85 @@ import requests
     
 API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApBVkLwVfkNqR0v6X9K8DcuyqZBycjrPixxx9-DQen0SeR0Qp2yjaTD4UlaXYx"
 
+import streamlit as st
+import requests
+
+    
+API_KEY = st.secrets.get("YELP_API_KEY")
+
 # Coordinates for Zurich (BY NOW we ONLY search around this location)
 ZURICH_LAT = 47.3769
 ZURICH_LON = 8.5417
+
+# We now also support the 9 biggest Swiss cities (by population) as search centers,
+# using their main train station or an equivalent central point as the reference
+# for the radius feature. Multiple common spellings are mapped to the same coords.
+CITY_COORDS = {
+    # Zurich
+    "zurich": (ZURICH_LAT, ZURICH_LON),
+    "zürich": (ZURICH_LAT, ZURICH_LON),
+    "zuerich": (ZURICH_LAT, ZURICH_LON),
+    "zurich hb": (ZURICH_LAT, ZURICH_LON),
+
+    # Basel
+    "basel": (47.5474, 7.5890),
+    "bâle": (47.5474, 7.5890),
+    "basel sbb": (47.5474, 7.5890),
+
+    # Geneva
+    "geneva": (46.2102, 6.1424),
+    "genève": (46.2102, 6.1424),
+    "genf": (46.2102, 6.1424),
+
+    # Lausanne
+    "lausanne": (46.5160, 6.6291),
+    "lausane": (46.5160, 6.6291),
+
+    # Winterthur
+    "winterthur": (47.4998, 8.7243),
+    "winterthur hb": (47.4998, 8.7243),
+
+    # St. Gallen (with various spellings)
+    "st. gallen": (47.4232, 9.3697),
+    "st gallen": (47.4232, 9.3697),
+    "sankt gallen": (47.4232, 9.3697),
+    "saint gallen": (47.4232, 9.3697),
+
+    # Lugano
+    "lugano": (46.0061, 8.9463),
+
+    # Bern
+    "bern": (46.9488, 7.4391),
+    "berne": (46.9488, 7.4391),
+
+    # Luzern
+    "luzern": (47.0502, 8.3102),
+    "lucerne": (47.0502, 8.3102),
+}
 
 # Base URLs for Yelp
 SEARCH_URL = "https://api.yelp.com/v3/businesses/search"
 DETAIL_URL = "https://api.yelp.com/v3/businesses/"
 
 
+def rating_to_emoji(rating):
+    """
+    Maps a numeric Yelp rating to a simple emoji for quick visual feedback.
+    """
+    if rating is None:
+        return "❓"
+    if rating >= 4.8:
+        return "🤩"
+    elif rating >= 4.5:
+        return "😋"
+    elif rating >= 4.0:
+        return "🙂"
+    else:
+        return "😐"
+
+
 # Main function used by the Streamlit app to get restaurant matches
-def api_access(latitude, longitude, open_at, radius, budget_level, cuisine):
+def api_access(city, radius, budget_level, cuisine, open_at=None):
     """
     Returns up to 3 restaurants in Zurich that match budget + cuisine.
     For each restaurant it returns:
@@ -25,7 +93,17 @@ def api_access(latitude, longitude, open_at, radius, budget_level, cuisine):
     - website
     - opening_hours (multi-line string)
     - menu_url (if available)
+
+    Additional:
+    We now support searches centered around the 9 largest Swiss cities, using their
+    main train stations or central points as reference for the radius search, because
+    these cities are the most relevant across Switzerland. Each result also includes
+    an emoji representation of the rating and image URLs retrieved from Yelp.
     """
+
+    if not API_KEY:
+        st.error("Yelp API key is missing. Add it to st.secrets['YELP_API_KEY'].")
+        return []
 
     # Build the HTTP header with the Bearer token so Yelp accepts our requests
     headers = {
@@ -42,26 +120,49 @@ def api_access(latitude, longitude, open_at, radius, budget_level, cuisine):
     }
     cuisine_alias = cuisine_alias_map.get(cuisine, cuisine)
 
+    # Resolve the chosen city (with many spelling variants) to coordinates.
+    city_key = (city or "zurich").strip().lower()
+    latitude, longitude = CITY_COORDS.get(city_key, (ZURICH_LAT, ZURICH_LON))
+
     # Helper function to execute a Yelp search request and return the "businesses" list
     # Yelp wraps actual hits under "businesses". If missing, default to empty list.
     def search(params):
-        resp = requests.get(SEARCH_URL, headers=headers, params=params)
-        data = resp.json()
-        return data.get("businesses", [])
+        try:
+            resp = requests.get(SEARCH_URL, headers=headers, params=params, timeout=5)
+            resp.raise_for_status()
+            data = resp.json()
+        except requests.RequestException as e:
+            st.error(f"Error contacting Yelp API: {e}")
+            return []
+        businesses = data.get("businesses", [])
+
+        # EXCLUDE restaurants with rating below 4.0.
+        # We only keep businesses where the (search-level) rating is >= 4.0.
+        businesses = [
+            b for b in businesses
+            if (b.get("rating") or 0) >= 4.0
+        ]
+        return businesses
 
     # Base search parameters: strict filter (Zurich + radius + cuisine + price)
     # - We ignore the latitude/longitude arguments and hard-code Zurich coordinates.
     # - "categories" is the mapped cuisine.
     # - "price" is a string "1", "2", "3", etc. (Yelp expects a string, not an int).
+    # Additional: we now use the resolved coordinates of one of the 9 biggest Swiss cities
+    # (by population) as the center of the radius search, with Zurich as the default fallback.
     params = {
-        "latitude": ZURICH_LAT,
-        "longitude": ZURICH_LON,
+        "latitude": latitude,
+        "longitude": longitude,
         "radius": radius,
         # "open_at": open_at,          # Can be re-enabled if you want time-based filtering
         "categories": cuisine_alias,
         "price": str(budget_level),
         "limit": 20,
     }
+
+    # If open_at is provided, actually pass it through to Yelp while keeping the original comment.
+    if open_at is not None:
+        params["open_at"] = open_at
 
     # First attempt: strict search using both cuisine and price filters
     businesses = search(params)
@@ -95,13 +196,18 @@ def api_access(latitude, longitude, open_at, radius, budget_level, cuisine):
 
         # If we have a business ID, call the detail endpoint to get richer data
         if biz_id:
-            detail_resp = requests.get(f"{DETAIL_URL}{biz_id}", headers=headers)
-            detail = detail_resp.json()
+            try:
+                detail_resp = requests.get(f"{DETAIL_URL}{biz_id}", headers=headers, timeout=5)
+                detail_resp.raise_for_status()
+                detail = detail_resp.json()
+            except requests.RequestException:
+                detail = {}
 
         # Prefer detail endpoint fields, but fall back to search results if missing.
         # This ensures we always have something sensible to show in the UI.
         name = detail.get("name") or b.get("name")
         rating = detail.get("rating") or b.get("rating")
+        rating_emoji = rating_to_emoji(rating)
         phone = detail.get("display_phone") or b.get("display_phone")
         url = detail.get("url") or b.get("url")
 
@@ -116,6 +222,10 @@ def api_access(latitude, longitude, open_at, radius, budget_level, cuisine):
             location.get("city"),
         ]
         address = ", ".join([part for part in address_parts if part])
+
+        # Primary image and additional photos pulled from Yelp.
+        primary_image_url = detail.get("image_url") or b.get("image_url")
+        photos = detail.get("photos") or []
 
         # --- Opening hours block ---
         # Yelp returns hours as a list of "open" entries with:
@@ -163,14 +273,20 @@ def api_access(latitude, longitude, open_at, radius, budget_level, cuisine):
 
         # Build the final normalized restaurant record that the Streamlit UI expects.
         # This keeps all downstream display logic simple and consistent.
+        # Additional fields:
+        # - rating_emoji: quick emoji representation of the rating (for UI).
+        # - image_url / photos: image URLs from Yelp to display pictures of the restaurant.
         results.append({
             "name": name,
             "rating": rating,
+            "rating_emoji": rating_emoji,
             "address": address,
             "phone": phone,
             "website": url,
             "opening_hours": opening_hours,
             "menu_url": menu_url,
+            "image_url": primary_image_url,
+            "photos": photos,
         })
 
     # Return the list with up to 3 processed restaurant entries
