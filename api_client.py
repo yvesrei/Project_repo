@@ -3,7 +3,7 @@ import streamlit as st
 import requests
 
     
-API_KEY = "7orLYaGwCifLnM0Ok6aMRFsdutKDtlrSfJUlwsWAGfRdJ8vGlDBjjwgOYS2KrFwimFod7CGdP0jcrrtcyvGr1iQuQPPZGmJ3wiP1qmXPedQCHk6f5Azt1L6jgfgZaXYx"
+API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApBVkLwVfkNqR0v6X9K8DcuyqZBycjrPixxx9-DQen0SeR0Qp2yjaTD4UlaXYx"
 
 
 # -------------------------------------

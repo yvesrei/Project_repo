@@ -82,9 +82,22 @@ def group_taste_profile(answers):
 
     # Gives us the weighted most common dining style of the list, by selecting the first one == the most common one.
 
-    most_common_dining_style = Counter(dining_style_scores).most_common(1)[0][0]
+    
 
-    st.session_state["group_cuisine"] = most_preferred_cuisine.lower()
+    # Counts the rank of the cuisine choices of the participants.
+    # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
+    # And gets the cuisine that has got the most points and stores it in "most_preferred_cuisine".
+    
+    
+
+    # Counts the rank of the cuisine choices of the participants.
+    # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
+    # And gets the cuisine that has got the most points and stores it in "most_preferred_cuisine".
+        # Counts how many times each dining style appears (after weighting).
+    dining_counts = Counter(dining_style_scores)
+
+    # Gives us the weighted most common dining style of the list
+    most_common_dining_style = dining_counts.most_common(1)[0][0]
 
     # Counts the rank of the cuisine choices of the participants.
     # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
@@ -93,13 +106,18 @@ def group_taste_profile(answers):
 
     for participant in answers:
         ranked_list = participant["ranked_cuisines"]
-
         for i, cuisine in enumerate(ranked_list):
-            weight = 3 - i
+            weight = 3 - i       # rank1=3, rank2=2, rank3=1
             cuisine_scores[cuisine] += weight
 
+    if cuisine_scores:
+        most_preferred_cuisine = cuisine_scores.most_common(1)[0][0]
+    else:
+        most_preferred_cuisine = "unknown"
 
-    most_preferred_cuisine = cuisine_scores.most_common(1)[0][0]
+    # Save cuisine for the API (lowercase, e.g. "italian")
+    st.session_state["group_cuisine"] = most_preferred_cuisine.lower()
+
 
     
     # Summary metrics --> shows the three group Values in boxes.
