@@ -151,7 +151,7 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         # "open_at": open_at,          # Can be re-enabled if you want time-based filtering
         "categories": cuisine_alias,
         "price": str(budget_level),
-        "limit": 20,
+        "limit": 50,
     }
 
     # First attempt: strict search using both cuisine and price filters

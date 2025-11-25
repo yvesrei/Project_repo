@@ -15,19 +15,21 @@ def show_api_results():
         st.error("Please go through the questionnaire and results page first.")
         return
 
-    # Page title for the restaurant results view
-    st.title("Matching Restaurants in Zürich!")
+    # Let the user pick one of the supported cities
+    city = st.selectbox(
+        "Choose your city",
+        ["Zurich", "Basel", "Geneva", "Lausanne", "Winterthur",
+         "St. Gallen", "Lugano", "Bern", "Luzern"]
+    )
 
-    # Call the Yelp API via api_access()
-    # Fetch matching restaurants from the Yelp API based on group budget and cuisine
-    # NOTE: api_access now expects (city, radius, budget_level, cuisine, open_at=None)
-    # We keep Zürich as the fixed city here by passing city="Zurich".
+    # Page title for the restaurant results view
+    st.title(f"Matching Restaurants in {city}!")
+
     results = api_access(
-        city="Zurich",
+        city=city,
         radius=2000,
         budget_level=st.session_state["group_budget_numeric"],
         cuisine=st.session_state["group_cuisine"],
-        # open_at is omitted – time-based filtering disabled
     )
 
     # Handle the case where no restaurants are returned
