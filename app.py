@@ -13,7 +13,7 @@ def show_api_results():
         st.error("Please go through the questionnaire and results page first.")
         return
 
-    st.title("Matching Restaurants in Zürich")
+    st.title("Matching Restaurants in Zürich!")
 
     # Call the Yelp API via api_access()
     results = api_access(
