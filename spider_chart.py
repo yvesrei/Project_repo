@@ -6,6 +6,9 @@ from collections import Counter
 import altair as alt
 import pandas as pd
 from sklearn.cluster import KMeans
+from pathlib import Path  
+import csv               
+
 
 # ---------- ML HELPER FUNCTIONS (NEW) ----------
 CUISINES = ["italian", "greek", "swiss", "chinese", "thai"]
@@ -20,6 +23,9 @@ DINING_STYLES = [
 
 BUDGET_DICT = {"$": 1, "$$": 2, "$$$": 3}
 REVERSE_BUDGET_DICT = {v: k for k, v in BUDGET_DICT.items()}
+
+DATA_FILE = Path("group_profiles.csv")
+
 
 def build_group_feature_vector(answers):
     """
@@ -83,45 +89,278 @@ def build_group_feature_vector(answers):
 
     return np.array(features, dtype=float)
 
+def generate_synthetic_group_profiles(n=50):
+    """
+    Generate n synthetic group profile vectors based on our archetypes:
+    - Cheap & Cheerful Squad
+    - Foodie Experience Hunters
+    - Mediterranean Comfort Crowd
+    - Local Traditionalists
+    - Asian Craving Crew
+    - Chill Whatever-Works Group
+
+    Each synthetic group is sampled around one archetype center with some noise.
+    """
+    rng = np.random.default_rng(42)
+    vectors = []
+
+    # Helper to build cuisine/dining arrays from dict
+    def pref_to_array(pref_dict, keys):
+        arr = np.array([pref_dict.get(k, 0.0) for k in keys], dtype=float)
+        arr = np.clip(arr, 1e-3, None)  # avoid zeros for Dirichlet
+        return arr
+
+    # Define archetype prototypes
+    archetypes = [
+        {
+            "name": "cheap_cheerful",
+            "weight": 1.0,
+            "budget_mean": 1.2,
+            "budget_imp_mean": 2.7,
+            "cuisine_imp_mean": 1.8,
+            "dining_imp_mean": 1.5,
+            "cuisine_pref": {
+                "italian": 0.2,
+                "greek": 0.2,
+                "swiss": 0.1,
+                "chinese": 0.25,
+                "thai": 0.25,
+            },
+            "dining_pref": {
+                "Takeaway": 0.5,
+                "Casual": 0.4,
+                "A la carte": 0.05,
+                "Set Menu / Chef's Menu": 0.02,
+                "Date Night": 0.03,
+            },
+        },
+        {
+            "name": "foodie_experience",
+            "weight": 1.0,
+            "budget_mean": 2.6,
+            "budget_imp_mean": 1.5,
+            "cuisine_imp_mean": 2.7,
+            "dining_imp_mean": 2.8,
+            "cuisine_pref": {
+                "italian": 0.3,
+                "greek": 0.2,
+                "swiss": 0.1,
+                "chinese": 0.2,
+                "thai": 0.2,
+            },
+            "dining_pref": {
+                "Takeaway": 0.05,
+                "Casual": 0.2,
+                "A la carte": 0.35,
+                "Set Menu / Chef's Menu": 0.25,
+                "Date Night": 0.15,
+            },
+        },
+        {
+            "name": "mediterranean_comfort",
+            "weight": 1.0,
+            "budget_mean": 2.0,
+            "budget_imp_mean": 2.0,
+            "cuisine_imp_mean": 2.5,
+            "dining_imp_mean": 2.0,
+            "cuisine_pref": {
+                "italian": 0.45,
+                "greek": 0.35,
+                "swiss": 0.1,
+                "chinese": 0.05,
+                "thai": 0.05,
+            },
+            "dining_pref": {
+                "Takeaway": 0.1,
+                "Casual": 0.5,
+                "A la carte": 0.3,
+                "Set Menu / Chef's Menu": 0.05,
+                "Date Night": 0.05,
+            },
+        },
+        {
+            "name": "local_traditionalists",
+            "weight": 0.8,
+            "budget_mean": 2.3,
+            "budget_imp_mean": 2.2,
+            "cuisine_imp_mean": 2.4,
+            "dining_imp_mean": 2.1,
+            "cuisine_pref": {
+                "italian": 0.15,
+                "greek": 0.15,
+                "swiss": 0.5,
+                "chinese": 0.1,
+                "thai": 0.1,
+            },
+            "dining_pref": {
+                "Takeaway": 0.1,
+                "Casual": 0.4,
+                "A la carte": 0.3,
+                "Set Menu / Chef's Menu": 0.15,
+                "Date Night": 0.05,
+            },
+        },
+        {
+            "name": "asian_craving",
+            "weight": 1.0,
+            "budget_mean": 2.0,
+            "budget_imp_mean": 1.8,
+            "cuisine_imp_mean": 2.7,
+            "dining_imp_mean": 2.0,
+            "cuisine_pref": {
+                "italian": 0.05,
+                "greek": 0.05,
+                "swiss": 0.05,
+                "chinese": 0.45,
+                "thai": 0.4,
+            },
+            "dining_pref": {
+                "Takeaway": 0.35,
+                "Casual": 0.4,
+                "A la carte": 0.15,
+                "Set Menu / Chef's Menu": 0.05,
+                "Date Night": 0.05,
+            },
+        },
+        {
+            "name": "chill_flexible",
+            "weight": 0.8,
+            "budget_mean": 2.0,
+            "budget_imp_mean": 2.0,
+            "cuisine_imp_mean": 2.0,
+            "dining_imp_mean": 2.0,
+            "cuisine_pref": {
+                "italian": 0.2,
+                "greek": 0.2,
+                "swiss": 0.2,
+                "chinese": 0.2,
+                "thai": 0.2,
+            },
+            "dining_pref": {
+                "Takeaway": 0.25,
+                "Casual": 0.4,
+                "A la carte": 0.2,
+                "Set Menu / Chef's Menu": 0.05,
+                "Date Night": 0.1,
+            },
+        },
+    ]
+
+    weights = np.array([a["weight"] for a in archetypes], dtype=float)
+    weights = weights / weights.sum()
+
+    for _ in range(n):
+        # Pick an archetype
+        idx = rng.choice(len(archetypes), p=weights)
+        a = archetypes[idx]
+
+        # Sample numeric features around the means, with noise
+        budget_numeric = np.clip(rng.normal(a["budget_mean"], 0.25), 1.0, 3.0)
+        budget_imp = np.clip(rng.normal(a["budget_imp_mean"], 0.4), 1.0, 3.0)
+        cuisine_imp = np.clip(rng.normal(a["cuisine_imp_mean"], 0.4), 1.0, 3.0)
+        dining_imp = np.clip(rng.normal(a["dining_imp_mean"], 0.4), 1.0, 3.0)
+
+        # Sample cuisine distribution from a Dirichlet around the archetype preferences
+        cuisine_alpha = pref_to_array(a["cuisine_pref"], CUISINES) * 8.0
+        cuisine_vec = rng.dirichlet(cuisine_alpha)
+
+        # Sample dining style distribution
+        dining_alpha = pref_to_array(a["dining_pref"], DINING_STYLES) * 8.0
+        dining_vec = rng.dirichlet(dining_alpha)
+
+        vec = [
+            budget_numeric,
+            budget_imp,
+            cuisine_imp,
+            dining_imp,
+            *cuisine_vec,
+            *dining_vec,
+        ]
+        vectors.append(vec)
+
+    return vectors
+
 
 def register_group_profile(feature_vector):
-    """Store this group's feature vector in session_state."""
+    """Store this group's feature vector in session_state AND on disk."""
     if feature_vector is None:
         return
 
+    # Keep current session behaviour (optional)
     if "group_profile_vectors" not in st.session_state:
         st.session_state["group_profile_vectors"] = []
-
     st.session_state["group_profile_vectors"].append(feature_vector.tolist())
+
+    # Append to CSV so it survives app restarts
+    try:
+        with DATA_FILE.open("a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(feature_vector.tolist())
+    except Exception as e:
+        st.warning(f"Could not save group profile to file: {e}")
+
 
 
 def cluster_group_profiles():
     """
-    Run K-Means on all stored group profiles.
+    Run K-Means on all stored group profiles (from CSV).
     Returns:
         labels  - cluster id per group
         centers - cluster centers
         current_group_label - cluster id of the current (last) dinner
     """
-    vectors_list = st.session_state.get("group_profile_vectors", [])
-    if len(vectors_list) < 2:
-        return None, None, None  # need at least 2 dinners
+    vectors_list = []
+
+    # If no data file yet, create synthetic examples
+    if not DATA_FILE.exists():
+        synthetic = generate_synthetic_group_profiles(n=50)
+        try:
+            with DATA_FILE.open("w", newline="") as f:
+                writer = csv.writer(f)
+                for vec in synthetic:
+                    writer.writerow(vec)
+        except Exception as e:
+            st.warning(f"Could not create synthetic profiles file: {e}")
+
+    # Load all historical profiles from CSV
+    if DATA_FILE.exists():
+        try:
+            with DATA_FILE.open("r", newline="") as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    if not row:
+                        continue
+                    try:
+                        vec = [float(x) for x in row]
+                        vectors_list.append(vec)
+                    except ValueError:
+                        continue
+        except Exception as e:
+            st.warning(f"Could not read group profiles file: {e}")
+
+    if len(vectors_list) == 0:
+        return None, None, None
 
     X = np.array(vectors_list, dtype=float)
     n_groups = X.shape[0]
 
-    n_clusters = min(3, n_groups)  # up to 3 group profile types
-
-    kmeans = KMeans(
-        n_clusters=n_clusters,
-        random_state=42,
-        n_init=10,
-    )
-    labels = kmeans.fit_predict(X)
-    centers = kmeans.cluster_centers_
+    # If only one dinner total, treat as one cluster
+    if n_groups == 1:
+        labels = np.array([0])
+        centers = X.copy()
+    else:
+        n_clusters = min(6, n_groups)  # up to 6 group profile types
+        kmeans = KMeans(
+            n_clusters=n_clusters,
+            random_state=42,
+            n_init=10,
+        )
+        labels = kmeans.fit_predict(X)
+        centers = kmeans.cluster_centers_
 
     current_group_label = int(labels[-1])  # last = current dinner
     return labels, centers, current_group_label
+
 
 
 def describe_cluster_center(center):
