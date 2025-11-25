@@ -20,13 +20,14 @@ def show_api_results():
 
     # Call the Yelp API via api_access()
     # Fetch matching restaurants from the Yelp API based on group budget and cuisine
+    # NOTE: api_access now expects (city, radius, budget_level, cuisine, open_at=None)
+    # We keep Zürich as the fixed city here by passing city="Zurich".
     results = api_access(
-        latitude=47.3769,   # ignored, by now we ONLY use ZURICH in api_client
-        longitude=8.5417,
-        open_at=1700000000,
+        city="Zurich",
         radius=2000,
         budget_level=st.session_state["group_budget_numeric"],
-        cuisine=st.session_state["group_cuisine"]
+        cuisine=st.session_state["group_cuisine"],
+        open_at=1700000000,  # you can still use your fixed timestamp if you like
     )
 
     # Handle the case where no restaurants are returned
