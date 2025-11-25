@@ -17,7 +17,7 @@ def show_api_results():
 
     # 👉 Call the Yelp API via api_access()
     results = api_access(
-        latitude=47.3769,                            # TODO: replace with real latitude
+        latitude = 47.3769,                          # TODO: replace with real latitude
         longitude=8.5417,                            # TODO: replace with real longitude
         open_at=1700000000,                          # TODO: real timestamp (Unix)
         radius=2000,                                 # in meters

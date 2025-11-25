@@ -4,7 +4,8 @@ import requests
 
     
 API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApBVkLwVfkNqR0v6X9K8DcuyqZBycjrPixxx9-DQen0SeR0Qp2yjaTD4UlaXYx"
-
+ZURICH_LAT = 47.3769
+ZURICH_LON = 8.5417
 
 # -------------------------------------
 # 🍽 Restaurant Finder Function
@@ -26,8 +27,8 @@ def api_access(latitude, longitude, open_at, radius, budget_level, cuisine):
     }
 
     params = {
-        "latitude": latitude,
-        "longitude": longitude,
+        "latitude": ZURICH_LAT,
+        "longitude": ZURICH_LON,
         "radius": radius,
         "open_at": open_at,
         "categories": cuisine,      # e.g. "italian"
