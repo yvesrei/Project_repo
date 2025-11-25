@@ -658,6 +658,9 @@ def group_taste_profile(answers):
     # ----------------------------------------------------
     # DINING STYLE PIE CHART (Altair)
     # ----------------------------------------------------
+        # ----------------------------------------------------
+    # DINING STYLE PIE CHART (Altair)
+    # ----------------------------------------------------
     st.subheader("Dining Style Distribution (Weighted)")
 
     if len(dining_counts) == 0:
@@ -677,7 +680,7 @@ def group_taste_profile(answers):
 
     st.markdown("---")
 
-        # 🔴 NEW: MACHINE LEARNING – GROUP PROFILE CLUSTERING 🔴
+    # MACHINE LEARNING – GROUP PROFILE CLUSTERING
     group_vector = build_group_feature_vector(answers)
     register_group_profile(group_vector)
 
@@ -700,9 +703,6 @@ def group_taste_profile(answers):
         )
         st.write(explanation)
 
-        
-
-
         # Store for other pages (e.g. API page)
         st.session_state["current_group_cluster_id"] = int(current_label)
         st.session_state["current_group_cluster_name"] = name
@@ -710,3 +710,4 @@ def group_taste_profile(answers):
     if st.button("Find matching Restaurants!"):
         st.session_state["page"] = "api"
         st.rerun()
+
