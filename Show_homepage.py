@@ -5,19 +5,11 @@ def show_homepage():
         # Path to the logo inside your project
     logo_path = os.path.join("Images", "FOODMINGLE_Logo_For_Streamlit_App.png")
 
-    st.image(logo_path, width=260)
+    # Center_logo
+    st.image(logo_path, width=240)   # Streamlit centers automatically
 
-    st.markdown(
-        """
-        <h1 style="text-align:center; margin-top:15px; color:#3d3a2a;">
-            Welcome to FoodMingle
-        </h1>
-        <p style="text-align:center; color:#6a6450;">
-            Where tastes meet.
-        </p>
-        """,
-        unsafe_allow_html=True
-    )
+    st.title("Welcome to FoodMingle")
+    st.caption("Where tastes meet.")
         
 
         
