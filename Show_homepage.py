@@ -5,15 +5,7 @@ def show_homepage():
         # Path to the logo inside your project
     logo_path = os.path.join("Images", "FOODMINGLE_Logo_For_Streamlit_App.png")
 
-    # Render centered logo
-    st.markdown(
-        f"""
-        <div style="display:flex; justify-content:center; margin-top:20px;">
-            <img src="{logo_path}" style="width:260px; border-radius:12px;" />
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.image(logo_path, width=260)
 
     st.markdown(
         """
