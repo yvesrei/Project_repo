@@ -9,12 +9,12 @@ def show_homepage():
     left, center, right = st.columns([1, 2, 1])
 
     with center:
-        st.image(logo_path, width=260)
+        st.image(logo_path, width=330)
         
 
 
-    st.header("Welcome to FoodMingle")
-    
+    st.header("Welcome to FoodMingle!")
+
          
         
         ## The user is able to select how many people will take part in the questionnaire in this select-button
