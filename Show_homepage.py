@@ -5,8 +5,11 @@ def show_homepage():
         # Path to the logo inside your project
     logo_path = os.path.join("Images", "FOODMINGLE_Final_Logo_TextMatch.png")
 
-    # Center_logo
-    st.image(logo_path, width=240)   # Streamlit centers automatically
+    # Create 3 columns for centering
+    left, center, right = st.columns([1, 2, 1])
+
+    with center:
+        st.image(logo_path, width=200)
 
     st.title("Welcome to FoodMingle")
     
