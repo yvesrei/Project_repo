@@ -9,12 +9,11 @@ def show_homepage():
     st.image(logo_path, width=240)   # Streamlit centers automatically
 
     st.title("Welcome to FoodMingle")
-    st.caption("Where tastes meet.")
+    
         
 
         
         ## Shows the title(name of app) and subheader (our slogan)
-    st.title("FOODMINGLE")
     st.subheader("Where tastes meet!")
         
         ## The user is able to select how many people will take part in the questionnaire in this select-button
