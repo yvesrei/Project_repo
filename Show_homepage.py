@@ -3,7 +3,7 @@ import os
 def show_homepage():
         
         # Path to the logo inside your project
-    logo_path = os.path.join("Images", "FOODMINGLE_Logo_For_Streamlit_App.png")
+    logo_path = os.path.join("Images", "FOODMINGLE_Final_Logo_TextMatch.png")
 
     # Center_logo
     st.image(logo_path, width=240)   # Streamlit centers automatically
