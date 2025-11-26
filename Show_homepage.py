@@ -13,9 +13,8 @@ def show_homepage():
         
 
 
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-         st.title("Welcome to FoodMingle")
+    st.header("Welcome to FoodMingle")
+    
          
         
         ## The user is able to select how many people will take part in the questionnaire in this select-button
