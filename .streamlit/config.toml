@@ -30,26 +30,34 @@ style = "normal"
 weight = 400
 
 [theme]
-primaryColor = "#cb785c"
-backgroundColor = "#fdfdf8"
-secondaryBackgroundColor = "#ecebe3"
-textColor = "#3d3a2a"
-linkColor = "#3d3a2a"
-borderColor = "#d3d2ca"
+# === COLOR PALETTE ===
+primaryColor = "#6A0F19"             # dark Bordeaux red
+backgroundColor = "#1A1A1A"          # deep dark grey
+secondaryBackgroundColor = "#2A2A2A" # medium dark grey
+textColor = "#F5F5F5"                # light grey/white for readability
+linkColor = "#C0464C"                # soft Bordeaux highlight
+borderColor = "#3A3A3A"              # dark border
+
+# === LAYOUT & STYLING ===
 showWidgetBorder = true
 baseRadius = "0.75rem"
 buttonRadius = "full"
+
+# === TYPOGRAPHY ===
 font = "SpaceGrotesk"
 headingFontWeights = [600,500,500,500,500,500]
 headingFontSizes = ["3rem", "2rem"]
 codeFont = "SpaceMono"
 codeFontSize = ".75rem"
-codeBackgroundColor = "#ecebe4"
+codeBackgroundColor = "#2D2D2D"
+
 showSidebarBorder = true
+
+# === CHART COLORS (kept same or want Bordeaux variants?) ===
 chartCategoricalColors = ["#0ea5e9", "#059669", "#fbbf24"]
 
 [theme.sidebar]
-backgroundColor = "#f0f0ec"
-secondaryBackgroundColor = "#ecebe3"
+backgroundColor = "#1F1F1F"
+secondaryBackgroundColor = "#2A2A2A"
 headingFontSizes = ["1.6rem", "1.4rem", "1.2rem"]
-dataframeHeaderBackgroundColor = "#e4e4e0"
+dataframeHeaderBackgroundColor = "#262626"
