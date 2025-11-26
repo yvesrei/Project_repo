@@ -9,15 +9,14 @@ def show_homepage():
     left, center, right = st.columns([1, 2, 1])
 
     with center:
-        st.image(logo_path, width=200)
-
-    st.title("Welcome to FoodMingle")
-    
+        st.image(logo_path, width=260)
         
 
-        
-        ## Shows the title(name of app) and subheader (our slogan)
-    st.subheader("Where tastes meet!")
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+         st.title("Welcome to FoodMingle")
+         st.caption("Where tastes meet!")
         
         ## The user is able to select how many people will take part in the questionnaire in this select-button
         # The number gets safed in "st.session_state" so the app remembers it across all pages.
