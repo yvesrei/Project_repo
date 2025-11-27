@@ -11,7 +11,18 @@ import csv
 
 
 # ---------- ML HELPER FUNCTIONS (NEW) ----------
-CUISINES = ["italian", "greek", "swiss", "chinese", "thai"]
+CUISINES = [
+    "Italian",
+    "Asian",
+    "Swiss / Alpine",
+    "Mediterranean",
+    "American",
+    "Middle Eastern",
+    "Latin American",
+    "Indian / South Asian",
+    "Vegetarian / Vegan",
+    "Seafood & Sushi"
+]
 
 DINING_STYLES = [
     "Takeaway",
@@ -120,11 +131,16 @@ def generate_synthetic_group_profiles(n=50):
             "cuisine_imp_mean": 1.8,
             "dining_imp_mean": 1.5,
             "cuisine_pref": {
-                "italian": 0.2,
-                "greek": 0.2,
-                "swiss": 0.1,
-                "chinese": 0.25,
-                "thai": 0.25,
+                "Italian": 0.12,
+                "Asian": 0.28,
+                "Swiss / Alpine": 0.06,
+                "Mediterranean": 0.18,
+                "American": 0.10,
+                "Middle Eastern": 0.06,
+                "Latin American": 0.06,
+                "Indian / South Asian": 0.06,
+                "Vegetarian / Vegan": 0.05,
+                "Seafood & Sushi": 0.03
             },
             "dining_pref": {
                 "Takeaway": 0.5,
@@ -142,11 +158,16 @@ def generate_synthetic_group_profiles(n=50):
             "cuisine_imp_mean": 2.7,
             "dining_imp_mean": 2.8,
             "cuisine_pref": {
-                "italian": 0.3,
-                "greek": 0.2,
-                "swiss": 0.1,
-                "chinese": 0.2,
-                "thai": 0.2,
+                "Italian": 0.20,
+                "Asian": 0.18,
+                "Swiss / Alpine": 0.08,
+                "Mediterranean": 0.20,
+                "American": 0.06,
+                "Middle Eastern": 0.08,
+                "Latin American": 0.08,
+                "Indian / South Asian": 0.06,
+                "Vegetarian / Vegan": 0.04,
+                "Seafood & Sushi": 0.12
             },
             "dining_pref": {
                 "Takeaway": 0.05,
@@ -164,11 +185,16 @@ def generate_synthetic_group_profiles(n=50):
             "cuisine_imp_mean": 2.5,
             "dining_imp_mean": 2.0,
             "cuisine_pref": {
-                "italian": 0.45,
-                "greek": 0.35,
-                "swiss": 0.1,
-                "chinese": 0.05,
-                "thai": 0.05,
+                "Italian": 0.35,
+                "Asian": 0.08,
+                "Swiss / Alpine": 0.10,
+                "Mediterranean": 0.30,
+                "American": 0.04,
+                "Middle Eastern": 0.05,
+                "Latin American": 0.02,
+                "Indian / South Asian": 0.02,
+                "Vegetarian / Vegan": 0.03,
+                "Seafood & Sushi": 0.01
             },
             "dining_pref": {
                 "Takeaway": 0.1,
@@ -186,11 +212,16 @@ def generate_synthetic_group_profiles(n=50):
             "cuisine_imp_mean": 2.4,
             "dining_imp_mean": 2.1,
             "cuisine_pref": {
-                "italian": 0.15,
-                "greek": 0.15,
-                "swiss": 0.5,
-                "chinese": 0.1,
-                "thai": 0.1,
+                "Italian": 0.10,
+                "Asian": 0.05,
+                "Swiss / Alpine": 0.55,
+                "Mediterranean": 0.10,
+                "American": 0.05,
+                "Middle Eastern": 0.04,
+                "Latin American": 0.03,
+                "Indian / South Asian": 0.03,
+                "Vegetarian / Vegan": 0.03,
+                "Seafood & Sushi": 0.02
             },
             "dining_pref": {
                 "Takeaway": 0.1,
@@ -208,11 +239,16 @@ def generate_synthetic_group_profiles(n=50):
             "cuisine_imp_mean": 2.7,
             "dining_imp_mean": 2.0,
             "cuisine_pref": {
-                "italian": 0.05,
-                "greek": 0.05,
-                "swiss": 0.05,
-                "chinese": 0.45,
-                "thai": 0.4,
+                "Italian": 0.03,
+                "Asian": 0.60,
+                "Swiss / Alpine": 0.04,
+                "Mediterranean": 0.08,
+                "American": 0.05,
+                "Middle Eastern": 0.03,
+                "Latin American": 0.04,
+                "Indian / South Asian": 0.08,
+                "Vegetarian / Vegan": 0.03,
+                "Seafood & Sushi": 0.02
             },
             "dining_pref": {
                 "Takeaway": 0.35,
@@ -230,11 +266,16 @@ def generate_synthetic_group_profiles(n=50):
             "cuisine_imp_mean": 2.0,
             "dining_imp_mean": 2.0,
             "cuisine_pref": {
-                "italian": 0.2,
-                "greek": 0.2,
-                "swiss": 0.2,
-                "chinese": 0.2,
-                "thai": 0.2,
+                "Italian": 0.12,
+                "Asian": 0.12,
+                "Swiss / Alpine": 0.12,
+                "Mediterranean": 0.12,
+                "American": 0.12,
+                "Middle Eastern": 0.10,
+                "Latin American": 0.08,
+                "Indian / South Asian": 0.08,
+                "Vegetarian / Vegan": 0.08,
+                "Seafood & Sushi": 0.06
             },
             "dining_pref": {
                 "Takeaway": 0.25,
@@ -245,6 +286,7 @@ def generate_synthetic_group_profiles(n=50):
             },
         },
     ]
+
 
     weights = np.array([a["weight"] for a in archetypes], dtype=float)
     weights = weights / weights.sum()
@@ -415,51 +457,107 @@ def describe_cluster_center(center):
     main_importance = importance_main()
 
     # --------- naming logic based on our archetypes ---------
+        # --------- naming logic based on new 10 cuisine groups ---------
     name = "Chill Whatever-Works Group"
     explanation = (
-        "Balanced preferences without strong extremes. Budget, cuisine and dining style "
-        "are all somewhat flexible."
+        "Balanced preferences without strong extremes. Your group is flexible across all dimensions."
     )
 
     # Cheap & Cheerful Squad
     if budget_numeric <= 1.6 and main_importance == "budget" and top_dining in ["Takeaway", "Casual"]:
         name = "Cheap & Cheerful Squad"
         explanation = (
-            "Your group strongly prioritises a low budget and prefers relaxed options like takeaway "
-            "or casual dining. Cuisine and dining style are more flexible as long as it stays affordable."
+            "Your group strongly prioritises a low budget and leans towards relaxed, casual places. "
+            "Cuisine is flexible as long as it’s affordable and easy-going."
         )
 
     # Foodie Experience Hunters
-    elif budget_numeric >= 2.4 and main_importance in ["cuisine", "dining"] and top_dining in ["A la carte", "Set Menu / Chef's Menu", "Date Night"]:
+    elif budget_numeric >= 2.4 and main_importance in ["cuisine", "dining"] and top_dining in [
+        "A la carte", "Set Menu / Chef's Menu", "Date Night"
+    ]:
         name = "Foodie Experience Hunters"
         explanation = (
-            "Your group is willing to spend more for a good experience. Cuisine and/or dining style are "
-            "the most important factors, and sit-down or special menus fit you well."
+            "Your group is willing to spend more for a memorable dining experience. "
+            "Cuisine and ambience are highly valued."
         )
 
-    # Mediterranean Comfort Crowd
-    elif top_cuisine in ["italian", "greek"] and 1.7 <= budget_numeric <= 2.4:
-        name = "Mediterranean Comfort Crowd"
-        explanation = (
-            "Your group is drawn to Mediterranean comfort food like Italian or Greek at a moderate budget. "
-            "You enjoy familiar flavours and a relaxed but proper sit-down meal."
-        )
+    # --------- cuisine-driven clusters (new 10 categories) ---------
 
-    # Local Traditionalists
-    elif top_cuisine == "swiss":
-        name = "Local Traditionalists"
+    # Italian Comfort Crowd
+    elif top_cuisine == "Italian":
+        name = "Italian Comfort Crowd"
         explanation = (
-            "Your group leans towards Swiss or traditional options. You value familiar local dishes "
-            "and a classic dining experience."
+            "Your group loves classic Italian comfort — pasta, pizza, trattorias or modern Italian kitchens. "
+            "Warm, familiar flavours feel just right."
         )
 
     # Asian Craving Crew
-    elif top_cuisine in ["chinese", "thai"]:
+    elif top_cuisine == "Asian":
         name = "Asian Craving Crew"
         explanation = (
-            "Your group has a clear craving for Asian flavours, especially {} and {}. "
-            "Cuisine is an important driver for your choice tonight."
-        ).format(top_cuisine.capitalize(), second_cuisine.capitalize())
+            "Your group has a clear preference for Asian flavours — whether it’s sushi, ramen, Thai or Chinese. "
+            "Bold flavours and variety matter most tonight."
+        )
+
+    # Local Traditionalists
+    elif top_cuisine == "Swiss / Alpine":
+        name = "Local Traditionalists"
+        explanation = (
+            "Your group leans toward Swiss and Alpine favourites — classic comfort food and familiar dishes."
+        )
+
+    # Mediterranean Lovers
+    elif top_cuisine == "Mediterranean":
+        name = "Mediterranean Lovers"
+        explanation = (
+            "Your group prefers Mediterranean flavours — Greek, Spanish, Italian influence or coastal dishes. "
+            "Warm, shareable, comforting foods define your taste."
+        )
+
+    # All-American Crowd
+    elif top_cuisine == "American":
+        name = "All-American Crowd"
+        explanation = (
+            "Your group enjoys American-style food — burgers, BBQ, diners or steakhouses. "
+            "Hearty, satisfying meals matter most tonight."
+        )
+
+    # Middle Eastern Enthusiasts
+    elif top_cuisine == "Middle Eastern":
+        name = "Middle Eastern Enthusiasts"
+        explanation = (
+            "Your group is drawn to Middle Eastern flavours — Lebanese, Persian or Arabic dishes. "
+            "You enjoy rich spices, grills, mezze and warm hospitality."
+        )
+
+    # Latin American Heat Seekers
+    elif top_cuisine == "Latin American":
+        name = "Latin American Heat Seekers"
+        explanation = (
+            "Your group loves the vibrant variety of Latin American cuisines — Mexican, Brazilian or Peruvian."
+        )
+
+    # Indian / South Asian Spice Lovers
+    elif top_cuisine == "Indian / South Asian":
+        name = "South Asian Spice Lovers"
+        explanation = (
+            "Your group clearly enjoys Indian or South Asian flavours — aromatic spices, curries and bold tastes."
+        )
+
+    # Plant-Based Preference Group
+    elif top_cuisine == "Vegetarian / Vegan":
+        name = "Plant-Based Preference Group"
+        explanation = (
+            "Your group shows a strong preference for vegetarian or vegan options — health-conscious and flavourful."
+        )
+
+    # Seafood / Sushi Lovers
+    elif top_cuisine == "Seafood & Sushi":
+        name = "Seafood & Sushi Lovers"
+        explanation = (
+            "Your group gravitates towards seafood, sushi, and fresh ocean flavours."
+        )
+
 
     # budget level string
     budget_level = (
@@ -586,8 +684,8 @@ def group_taste_profile(answers):
     else:
         most_preferred_cuisine = "unknown"
 
-    # Save cuisine for the API (lowercase, e.g. "italian")
-    st.session_state["group_cuisine"] = most_preferred_cuisine.lower()
+    # Save cuisine for the API
+    st.session_state["group_cuisine"] = most_preferred_cuisine
 
 
     

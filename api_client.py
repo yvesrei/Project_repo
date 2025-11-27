@@ -1,9 +1,38 @@
 import streamlit as st
 import requests
 
+
     
 API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApBVkLwVfkNqR0v6X9K8DcuyqZBycjrPixxx9-DQen0SeR0Qp2yjaTD4UlaXYx"
 
+#Cuisine mapping system
+CUISINE_MAPPING = {
+    "Italian": ["italian", "pizza", "pasta", "trattoria", "brasserie", "bistro"],
+    "Asian": ["asian", "thai", "chinese", "szechuan", "cantonese", "japanese",
+              "sushi", "ramen", "korean", "vietnamese", "nepalese", "himalayan",
+              "asianfusion"],
+    "Swiss / Alpine": ["swiss", "swissfood", "fondue", "raclette", "beiz",
+                       "austrian", "german", "schweizer küche", "wirtshaus"],
+    "Mediterranean": ["mediterranean", "greek", "spanish", "tapas", "portuguese",
+                      "french", "mezze", "turkish"],
+    "American": ["american", "burger", "bbq", "barbecue", "steakhouse", "diner"],
+    "Middle Eastern": ["middleeastern", "lebanese", "arabic", "persian", "falafel",
+                       "kebab", "halal"],
+    "Latin American": ["latin", "mexican", "texmex", "peruvian", "brazilian",
+                       "argentinian"],
+    "Indian / South Asian": ["indian", "pakistani", "srilankan", "srilankisch",
+                             "southasian"],
+    "Vegetarian / Vegan": ["vegetarian", "vegan", "healthy", "plantbased",
+                           "glutenfree"],
+    "Seafood & Sushi": ["seafood", "fish", "sushi", "fishmarket"]
+}
+def map_yelp_category(yelp_categories):
+    yelp_categories = [c.lower() for c in yelp_categories]
+    for simple, detailed_list in CUISINE_MAPPING.items():
+        for d in detailed_list:
+            if d in yelp_categories:
+                return simple
+    return "International"
 # Coordinates for Zurich (BY NOW we ONLY search around this location)
 ZURICH_LAT = 47.3769
 ZURICH_LON = 8.5417
@@ -105,14 +134,7 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
     }
 
     # Map our internal cuisine labels to Yelp's category aliases.
-    cuisine_alias_map = {
-        "italian": "italian",
-        "greek": "greek",
-        "swiss": "swissfood",
-        "chinese": "chinese",
-        "thai": "thai",
-    }
-    cuisine_alias = cuisine_alias_map.get(cuisine, cuisine)
+
 
     # Resolve the chosen city (with many spelling variants) to coordinates.
     city_key = (city or "zurich").strip().lower()
@@ -149,7 +171,7 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         "longitude": longitude,
         "radius": radius,
         # "open_at": open_at,          # Can be re-enabled if you want time-based filtering
-        "categories": cuisine_alias,
+        "categories": cuisine.lower(),
         "price": str(budget_level),
         "limit": 50,
     }
@@ -181,6 +203,12 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
 
     # For each business, optionally fetch more detailed data and normalize it.
     for b in businesses:
+
+        yelp_aliases = [c.get("alias", "").lower() for c in b.get("categories", [])]
+        mapped_cuisine = map_yelp_category(yelp_aliases)
+        if mapped_cuisine != cuisine:
+            continue
+
         biz_id = b.get("id")
         detail = {}
 
