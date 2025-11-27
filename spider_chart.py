@@ -387,19 +387,28 @@ def cluster_group_profiles():
 
     # 🔴 NEW: if file exists but has too few rows (e.g. only 1),
     # top it up with synthetic profiles so we have at least 50 total.
+    # --- Ensure we have at least 50 profiles in memory ---
     if len(vectors_list) < 50:
         needed = 50 - len(vectors_list)
         synthetic_extra = generate_synthetic_group_profiles(n=needed)
         vectors_list.extend(synthetic_extra)
 
-        # Also append these extra ones to the CSV so it stays in sync
+    # Try writing them to CSV; if writing fails, recreate the whole file
+    try:
+        with DATA_FILE.open("w", newline="") as f:  # overwrite completely
+            writer = csv.writer(f)
+            for vec in vectors_list:  # write ALL valid vectors
+                writer.writerow(vec)
+    except Exception as e:
+        st.warning("⚠️ Could not update profiles file — recreating it fresh.")
         try:
-            with DATA_FILE.open("a", newline="") as f:
+            with DATA_FILE.open("w", newline="") as f:
                 writer = csv.writer(f)
-                for vec in synthetic_extra:
+                for vec in vectors_list:
                     writer.writerow(vec)
-        except Exception as e:
-            st.warning(f"Could not extend group profiles file: {e}")
+        except Exception:
+            st.error("❌ Could not recreate the group profiles file at all.")
+
 
     if len(vectors_list) == 0:
         return None, None, None
