@@ -32,6 +32,7 @@ DINING_STYLES = [
     "Date Night",
 ]
 
+EXPECTED_DIM = 4 + len(CUISINES) + len(DINING_STYLES)
 BUDGET_DICT = {"$": 1, "$$": 2, "$$$": 3}
 REVERSE_BUDGET_DICT = {v: k for k, v in BUDGET_DICT.items()}
 
@@ -365,6 +366,7 @@ def cluster_group_profiles():
             st.warning(f"Could not create synthetic profiles file: {e}")
 
     # Load all historical profiles from CSV
+        # Load all historical profiles from CSV
     if DATA_FILE.exists():
         try:
             with DATA_FILE.open("r", newline="") as f:
@@ -374,11 +376,14 @@ def cluster_group_profiles():
                         continue
                     try:
                         vec = [float(x) for x in row]
-                        vectors_list.append(vec)
+                        # ⚠️ Skip old rows with wrong vector length
+                        if len(vec) == EXPECTED_DIM:
+                            vectors_list.append(vec)
                     except ValueError:
                         continue
         except Exception as e:
             st.warning(f"Could not read group profiles file: {e}")
+
 
     # 🔴 NEW: if file exists but has too few rows (e.g. only 1),
     # top it up with synthetic profiles so we have at least 50 total.
