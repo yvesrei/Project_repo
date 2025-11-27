@@ -7,24 +7,118 @@ from About_us import show_about_us
 from api_client import api_access
 
 
-# Display restaurant matches based on stored group results from spider web
+import streamlit as st
+import importlib
+from api_client import api_access
+
+
+# ------------------------------------------------------------
+# 1) BASIC CONFIGURATION
+# ------------------------------------------------------------
+# Streamlit page settings
+st.set_page_config(page_title="FoodMingle", layout="wide")
+
+# ------------------------------------------------------------
+# 2) PAGE REGISTRY
+# ------------------------------------------------------------
+# This dictionary maps the visible page names in the navigation
+# bar to the matching Python modules inside the /pages folder.
+# Each module contains a render(back_button) function.
+PAGES = {
+    "Homepage": "1_Homepage",
+    "Questionnaire": "2_Questionnaire",
+    "Result": "3_Result",
+    "Restaurant Matches": "4_API_Results",
+    "About Us": "5_About_Us",
+}
+
+
+# ------------------------------------------------------------
+# 3) SESSION STATE INITIALIZATION
+# ------------------------------------------------------------
+# We store:
+# - current_page: which page the user is on
+# - history: to enable a working "Back" button
+
+if "history" not in st.session_state:
+    # Holds the navigation history (stack)
+    st.session_state.history = []
+
+if "current_page" not in st.session_state:
+    # Default start page
+    st.session_state.current_page = "Homepage"
+
+
+# ------------------------------------------------------------
+# 4) TOP NAVIGATION BAR
+# ------------------------------------------------------------
+# This replaces your old manual router. Streamlit now shows
+# a native navigation bar at the top, like a real website.
+
+navigation = st.navigation({"FoodMingle": list(PAGES.keys())})
+selected_page = navigation.run()
+
+
+# ------------------------------------------------------------
+# 5) HISTORY MANAGEMENT (for BACK BUTTON)
+# ------------------------------------------------------------
+# Only add to history when changing pages.
+
+if selected_page != st.session_state.current_page:
+    st.session_state.history.append(st.session_state.current_page)
+    st.session_state.current_page = selected_page
+
+
+# ------------------------------------------------------------
+# 6) BACK BUTTON IMPLEMENTATION
+# ------------------------------------------------------------
+# This creates a real "Back" button that returns the user to
+# the previously visited page, not always to the homepage.
+
+def back_button():
+    if st.session_state.history:
+        if st.button("⬅️ Back"):
+            st.session_state.current_page = st.session_state.history.pop()
+            st.rerun()
+
+
+# ------------------------------------------------------------
+# 7) PAGE LOADING
+# ------------------------------------------------------------
+# We dynamically import the module for the selected page and
+# call its render(back_button) function.
+
+module = importlib.import_module(f"pages.{PAGES[st.session_state.current_page]}")
+module.render(back_button)
+
+
+# ------------------------------------------------------------
+# 8) API RESULT PAGE FUNCTION (kept from your original code)
+# ------------------------------------------------------------
+# This function is used inside pages/4_API_Results.py.
+# It displays restaurant matches after the taste profile is
+# computed in the spider_chart result page.
+
 def show_api_results():
 
-    # Stop if required data from previous steps is missing
+    # Stop if required group results are missing
     if "group_budget_numeric" not in st.session_state or "group_cuisine" not in st.session_state:
         st.error("Please go through the questionnaire and results page first.")
         return
 
-    # Let the user pick one of the supported cities
+    # Let the user select a supported city
     city = st.selectbox(
         "Choose your city",
-        ["Zurich", "Basel", "Geneva", "Lausanne", "Winterthur",
-         "St. Gallen", "Lugano", "Bern", "Luzern"]
+        [
+            "Zurich", "Basel", "Geneva", "Lausanne", "Winterthur",
+            "St. Gallen", "Lugano", "Bern", "Luzern"
+        ]
     )
 
-    # Page title for the restaurant results view
+    # Page title
     st.title(f"Matching Restaurants in {city}!")
 
+    # Call the Yelp-like API (your function from api_client.py)
     results = api_access(
         city=city,
         radius=2000,
@@ -32,13 +126,12 @@ def show_api_results():
         cuisine=st.session_state["group_cuisine"],
     )
 
-    # Handle the case where no restaurants are returned
+    # Handle empty results
     if not results:
         st.warning("No restaurants found even after relaxing filters.")
         return
 
-    # Display each restaurant's key information to the user, including name, rarting, address, phone, 
-    # website, opening hours, and menu URL
+    # Display each restaurant's information
     for r in results:
         st.subheader(r["name"])
 
@@ -62,88 +155,3 @@ def show_api_results():
             st.markdown(f"[Menu]({r['menu_url']})")
 
         st.markdown("---")
-
-
-# --- 1. Session state initialization ---
-# Streamlit reruns the script on every interaction. We use st.session_state
-# to persist values across reruns so we know:
-# - which page the user is on,
-# - how many participants there are,
-# - which participant is currently answering,
-# - and all collected answers so far.
-
-if "page" not in st.session_state:
-    # First run: start the user on the home page.
-    st.session_state["page"] = "home"
-else:
-    # Later runs: keep the current page value so navigation is stable.
-    pass
-
-if "num_of_participants" not in st.session_state:
-    # Stores the total number of people who will answer the questionnaire.
-    # Initially unknown, so set it to None until the user enters it.
-    st.session_state["num_of_participants"] = None
-else:
-    # Once set on the home page, this value is reused across pages.
-    pass
-
-if "current_participant" not in st.session_state:
-    # Tracks which participant is currently filling out the questionnaire.
-    # We start counting at 1 for the first participant.
-    st.session_state["current_participant"] = 1
-else:
-    # This counter is typically incremented when one participant finishes.
-    pass
-
-if "answers" not in st.session_state:
-    # List that holds one answer dictionary per participant.
-    # Each element should contain that participant's responses.
-    st.session_state["answers"] = []
-else:
-    # On reruns, we keep all previously collected answers intact.
-    pass
-
-
-# --- 2. Page navigation (router) ---
-# The "page" key in session_state acts as a simple router.
-# Depending on its value, we call exactly one view function.
-# Other parts of the app (buttons, etc.) update st.session_state["page"]
-# to switch between screens.
-
-page = st.session_state.get("page", "home")
-
-if page == "home":
-    # Home screen:
-    # - Introduces the app
-    # - Asks for number of participants
-    # - Provides entry point into the questionnaire flow
-    show_homepage()
-
-elif page == "questionnaire":
-    # Questionnaire screen:
-    # - Collects answers for the current participant
-    # - Uses current_participant and num_of_participants from session_state
-    show_questionnaire()
-
-elif page == "result":
-    # Result screen:
-    # - Aggregates all participants' answers
-    # - Computes and displays the group taste profile
-    group_taste_profile(st.session_state["answers"])
-
-elif page == "api":
-    # API results screen:
-    # - Uses the computed group profile (budget, cuisine)
-    # - Calls the external API (e.g. Yelp) and displays matching restaurants
-    show_api_results()
-
-elif page == "about":
-    # About screen:
-    # - Static information about the app, authors, or context
-    show_about_us()
-
-else:
-    # Fallback for invalid / unexpected page values:
-    # - Reset to home to avoid the app breaking on a bad state
-    st.session_state["page"] = "home"
-    show_homepage()
