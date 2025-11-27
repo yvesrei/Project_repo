@@ -76,7 +76,7 @@ def show_questionnaire():
 
         else:
             ranked_cuisines = []
-            st.warning("⚠️ You must select exactly 3 cuisines to rank them.")
+            st.warning("You must select exactly 3 cuisines to rank them!")
 
         
         ## Selectbox where participant decides his preferred dining style.
