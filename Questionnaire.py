@@ -91,7 +91,7 @@ def show_questionnaire():
               key=f"dining_style_{participant}"
         )
         
-        st.markdown("### Importance of the three factors (use 1, 2, 3 once each)")
+        st.markdown("Rank the three attributes using 1, 2, and 3 (3 = most important). Use each number once.")
 
 
         ## The importance ranking system
