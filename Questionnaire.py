@@ -19,7 +19,7 @@ def show_questionnaire():
         if f"budget_{participant}" not in st.session_state:
               st.session_state[f"budget_{participant}"] = None
               st.session_state[f"type_of_cuisine_{participant}"] = []
-              st.session_state[f"dining_style_{participant}"] = None
+              st.session_state[f"walking_distance_{participant}"] = None
 
         
         # In this button each participant can choose his budget preference and
@@ -28,7 +28,7 @@ def show_questionnaire():
 
         budget = st.selectbox(
             "Your budget preference",
-            options=["$","$$","$$$"],
+            options=["$","$$","$$$, $$$$"],
             index=None,
             placeholder="Please choose your budget",
             key=f"budget_{participant}"
@@ -91,14 +91,14 @@ def show_questionnaire():
         ## Selectbox where participant decides his preferred dining style.
         # Stored as well in a specific participant key.
 
-
-        dining_style= st.selectbox(
-              "Your dining style preference",
-              options=["Takeaway","Casual", "A la carte", "Set Menu / Chef's Menu", "Date Night"],
-              index=None,
-              placeholder= "Please choose your preferred dining style",
-              key=f"dining_style_{participant}"
+        walking_distance = st.selectbox(
+        "🚶 How far are you willing to walk from the main train station?",
+        options= ["5 minutes", "10 minutes", "15 minutes", "No preference"],
+        index= None,
+        placeholder= "Please choose your preferred walking distance",
+              key=f"walking_distance_{participant}"
         )
+    
         
         st.markdown("Rank the three attributes using 1, 2, and 3 (3 = most important). Use each number once.")
 
@@ -125,11 +125,11 @@ def show_questionnaire():
              )
 
    
-        dining_style_importance = [v for v in [1, 2, 3]
+        walking_distance_importance = [v for v in [1, 2, 3]
                                    if v not in [budget_importance, cuisine_importance]][0]
 
 
-        st.write(f"Importance of DINING STYLE: **{dining_style_importance}** (auto-assigned)")
+        st.write(f"Importance of WALKING DISTANCE: **{walking_distance_importance}** (auto-assigned)")
 
 
         ## This button performs at first the validation with the check if the participant has selected all valid answers. 
@@ -147,8 +147,8 @@ def show_questionnaire():
              if budget is None:
                   st.error("❌ Please select a budget before continuing.")
                   st.stop()
-             if dining_style is None:
-                  st.error("❌ Please select a dining style before continuing.")
+             if walking_distance is None:
+                  st.error("❌ Please select a walking distance before continuing.")
                   st.stop()
 
            
@@ -158,8 +158,8 @@ def show_questionnaire():
                  "type_of_cuisine": type_of_cuisine,
                  "ranked_cuisines": ranked_cuisines,
                  "cuisine_importance": cuisine_importance,
-                 "dining_style": dining_style, 
-                 "dining_style_importance": dining_style_importance
+                 "walking_distance": walking_distance, 
+                 "walking_distance_importance": walking_distance_importance
            })
                  
             
