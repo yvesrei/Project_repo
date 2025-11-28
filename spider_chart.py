@@ -467,35 +467,43 @@ def describe_cluster_center(center):
     main_importance = max(vals, key=vals.get)
 
     # ==========================================
-    # CLUSTER NAMING LOGIC (UPDATED)
+    # CLUSTER NAMING LOGIC (FINAL VERSION)
     # ==========================================
 
-    name = "Balanced Whatever-Works Group"
-    explanation = "Your group is flexible without strong extremes."
-
     # -------- Cheap & Cheerful Squad --------
-    # OLD LOGIC used: low budget + casual dining styles
-    # NEW LOGIC: low budget + short walking distance OR budget importance high
     if budget_numeric <= 1.6 and main_importance == "budget":
         name = "Cheap & Cheerful Squad"
         explanation = (
             "Your group strongly prioritises a low budget and prefers easy, nearby options. "
             "Cuisine is flexible as long as it's affordable and convenient."
         )
+        return name, explanation, {
+            "budget_level": "$" if budget_numeric < 1.5 else "$$",
+            "main_cuisine": top_cuisine,
+            "second_cuisine": second_cuisine,
+            "main_importance_dimension": main_importance,
+            "walking_radius": int(walking_radius)
+        }
 
     # -------- Foodie Experience Hunters --------
-    # OLD LOGIC used: $$$ dining styles + high cuisine/dining importance
-    # NEW LOGIC: high budget + high cuisine importance + willing to walk far
-    elif budget_numeric >= 2.4 and main_importance in ["cuisine"] and walking_radius > 900:
+    elif budget_numeric >= 2.4 and main_importance == "cuisine" and walking_radius > 900:
         name = "Foodie Experience Hunters"
         explanation = (
             "Your group is willing to spend more and walk further for a memorable dining experience. "
             "Cuisine quality matters the most."
         )
+        return name, explanation, {
+            "budget_level": "$$" if budget_numeric < 2.5 else "$$$",
+            "main_cuisine": top_cuisine,
+            "second_cuisine": second_cuisine,
+            "main_importance_dimension": main_importance,
+            "walking_radius": int(walking_radius)
+        }
 
-    # -------- Cuisine-driven clusters (unchanged) --------
-
-    elif top_cuisine == "Italian":
+    # ==========================================
+    # CUISINE-ONLY CLUSTERS (ALWAYS MATCH TOP CUISINE)
+    # ==========================================
+    if top_cuisine == "Italian":
         name = "Italian Comfort Crowd"
         explanation = (
             "Your group loves classic Italian comfort — pasta, pizza, trattorias or modern Italian kitchens."
@@ -555,7 +563,9 @@ def describe_cluster_center(center):
             "Your group gravitates towards seafood, sushi, and fresh ocean flavours."
         )
 
-    # Convert numeric budget back to a symbol
+    # ------------------------------------------
+    # DEFAULT RETURN (always cuisine-aligned)
+    # ------------------------------------------
     budget_level = (
         "$" if budget_numeric < 1.5 else
         "$$" if budget_numeric < 2.5 else
@@ -571,6 +581,7 @@ def describe_cluster_center(center):
     }
 
     return name, explanation, details
+
 
 
 
