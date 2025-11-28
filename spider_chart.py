@@ -677,7 +677,18 @@ def group_taste_profile(answers):
     with col2:
         st.metric("Top Cuisine", most_preferred_cuisine)
     with col3:
-        st.metric("Walking Distance", f"{int(group_walking_radius)} m")
+        # Convert weighted meters back into minutes (rounded)
+        if group_walking_radius <= 700:
+            walk_label = "5 minutes"
+        elif group_walking_radius <= 1150:
+            walk_label = "10 minutes"
+        elif group_walking_radius <= 2000:
+            walk_label = "15 minutes"
+        else:
+            walk_label = "No preference"
+
+        st.metric("Walking Distance", walk_label)
+
 
     st.markdown("---")
 
