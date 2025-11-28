@@ -172,7 +172,7 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         "radius": radius,
         # "open_at": open_at,          # Can be re-enabled if you want time-based filtering
         "categories": cuisine.lower(),
-        "price": str(budget_level),
+        "price": str(int(budget_level)),
         "limit": 50,
     }
 
@@ -206,7 +206,7 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
 
         yelp_aliases = [c.get("alias", "").lower() for c in b.get("categories", [])]
         mapped_cuisine = map_yelp_category(yelp_aliases)
-        if mapped_cuisine != cuisine:
+        if mapped_cuisine.lower() != cuisine.lower():
             continue
 
         biz_id = b.get("id")
