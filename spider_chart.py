@@ -587,158 +587,101 @@ def describe_cluster_center(center):
 
 def group_taste_profile(answers):
 
-    # Titlle and headers for the result summary
+    # Title
     st.title("This is your groups taste profile of today!")
-
     st.subheader("Let's analyze it.")
-
     st.header("Results Summary")
 
-
-    # Created a dictionary to convert the budget answers into numeric Values example: "$" --> 1.
-
-    budget_dict = {"$":1, "$$":2, "$$$":3}
-
-   # Create empty lists to store interim results.
-
-    budget_scores= []
-    budget_weights=[]
-
-
-    ## For each participant their numeric budget value gets multiplied by their importance value.
-    # This gives more weight to the answers of participants who chose to give their budget preference more weight.
+    # ---- BUDGET CALCULATION ----
+    budget_dict = {"$": 1, "$$": 2, "$$$": 3}
+    budget_scores = []
+    budget_weights = []
 
     for participant in answers:
-        
-        budget_value= participant["budget"]
-
-        numeric_budget= budget_dict[budget_value]
-
-        budget_import= participant["budget_importance"]
-
-        weighted_score= numeric_budget * budget_import
-
-        budget_scores.append(weighted_score)
-
-        budget_weights.append(budget_import)
-
-    # Calculates the weighted group averagre result of the group budget value.
+        numeric_budget = budget_dict[participant["budget"]]
+        imp = participant["budget_importance"]
+        budget_scores.append(numeric_budget * imp)
+        budget_weights.append(imp)
 
     group_budget = sum(budget_scores) / sum(budget_weights)
-
-    ## Rounds the weigthed group value to the nearest whole number and converts it back into "$, $$, $$$".
-
-    rounded_budget= round(group_budget)
+    rounded_budget = round(group_budget)
 
     reverse_budget_dict = {1: "$", 2: "$$", 3: "$$$"}
-
-    budget_symbol_group = reverse_budget_dict.get(rounded_budget, "Unknown")
+    budget_symbol_group = reverse_budget_dict.get(rounded_budget, "$")
 
     st.session_state["group_budget_numeric"] = str(rounded_budget)
 
-    
-    
-
-    # Counts the rank of the cuisine choices of the participants.
-    # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
-    # And gets the cuisine that has got the most points and stores it in "most_preferred_cuisine".
+    # ---- CUISINE SCORING ----
     cuisine_scores = Counter()
+    for p in answers:
+        for i, cuisine in enumerate(p["ranked_cuisines"]):
+            cuisine_scores[cuisine] += (3 - i)
 
-    for participant in answers:
-        ranked_list = participant["ranked_cuisines"]
-        for i, cuisine in enumerate(ranked_list):
-            weight = 3 - i       # rank1=3, rank2=2, rank3=1
-            cuisine_scores[cuisine] += weight
-
-    if cuisine_scores:
-        most_preferred_cuisine = cuisine_scores.most_common(1)[0][0]
-    else:
-        most_preferred_cuisine = "unknown"
-
-    # Save cuisine for the API
+    most_preferred_cuisine = (
+        cuisine_scores.most_common(1)[0][0] if cuisine_scores else "unknown"
+    )
     st.session_state["group_cuisine"] = most_preferred_cuisine
 
-    # ---- WALKING DISTANCE GROUP RESULT ----
+    # ---- WALKING DISTANCE (METERS) ----
     DISTANCE_DICT = {
         "5 minutes": 500,
         "10 minutes": 900,
         "15 minutes": 1400,
         "No preference": 3000
-        }
+    }
 
     walking_scores = []
     walking_weights = []
-
     for p in answers:
         walking_scores.append(DISTANCE_DICT[p["walking_distance"]] * p["walking_distance_importance"])
         walking_weights.append(p["walking_distance_importance"])
 
     group_walking_radius = sum(walking_scores) / sum(walking_weights)
-
-    # Save walking result for API
     st.session_state["group_walking_radius"] = int(group_walking_radius)
 
+    # Convert meters → label
+    if group_walking_radius <= 700:
+        walk_label = "5 minutes"
+    elif group_walking_radius <= 1150:
+        walk_label = "10 minutes"
+    elif group_walking_radius <= 2000:
+        walk_label = "15 minutes"
+    else:
+        walk_label = "No preference"
 
-
-    
-    # Summary metrics --> shows the three group Values in boxes.
+    # ---- SUMMARY METRICS ----
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric("Budget Preference", budget_symbol_group)
     with col2:
         st.metric("Top Cuisine", most_preferred_cuisine)
     with col3:
-        # Convert weighted meters back into minutes (rounded)
-        if group_walking_radius <= 700:
-            walk_label = "5 minutes"
-        elif group_walking_radius <= 1150:
-            walk_label = "10 minutes"
-        elif group_walking_radius <= 2000:
-            walk_label = "15 minutes"
-        else:
-            walk_label = "No preference"
-
         st.metric("Walking Distance", walk_label)
-
 
     st.markdown("---")
 
-    
+    # ---- IMPORTANCE BAR CHART ----
     st.subheader("Importance Distribution")
-
-
-    budget_importance_group = np.mean([p["budget_importance"] for p in answers])
-    cuisine_importance_group = np.mean([p["cuisine_importance"] for p in answers])
-    walking_importance_group  = np.mean([p["walking_distance_importance"] for p in answers])
 
     df_radar = pd.DataFrame({
         "category": ["Budget", "Cuisine", "Walking Distance"],
         "value": [
-            budget_importance_group,
-            cuisine_importance_group,
-            walking_importance_group
-            ]
-            })
-
-
+            np.mean([p["budget_importance"] for p in answers]),
+            np.mean([p["cuisine_importance"] for p in answers]),
+            np.mean([p["walking_distance_importance"] for p in answers])
+        ]
+    })
 
     chart = alt.Chart(df_radar).mark_bar().encode(
-    x=alt.X("category:N", title="Category"),
-    y=alt.Y("value:Q", title="Average Importance (1–3)"),
-    color=alt.Color("category:N")
+        x=alt.X("category:N", title="Category"),
+        y=alt.Y("value:Q", title="Average Importance (1–3)"),
+        color=alt.Color("category:N")
     )
-
     st.altair_chart(chart, use_container_width=True)
 
     st.markdown("---")
 
-
-    ## This code block visualizes the weighted cuisine scores as a bar chart.
-    # We first convert the cuisine_scores counter into a dataframe so Altair can read the data init.
-    # Each bar then represents one cuisine and how many points it received in total.
-    # Sorted from most points to least points.
-
-
+    # ---- CUISINE BAR CHART ----
     st.subheader("Cuisine Preference Strength")
 
     df_cuisine = pd.DataFrame({
@@ -751,33 +694,45 @@ def group_taste_profile(answers):
         y=alt.Y("Cuisine:N", sort='-x'),
         color=alt.value("#55A868")
     )
-
     st.altair_chart(bar, use_container_width=True)
 
     st.markdown("---")
 
-   # ------------------------------------------
-# WALKING DISTANCE DISTRIBUTION CHART
-# ------------------------------------------
+    # ------------------------------------------
+    # WALKING DISTANCE PIE CHART (FIXED)
+    # ------------------------------------------
     st.subheader("Walking Distance Preferences (Weighted)")
 
+    DISTANCE_TO_MINUTES = {
+        "5 minutes": 5,
+        "10 minutes": 10,
+        "15 minutes": 15,
+        "No preference": 20
+    }
+
+    walking_minutes_scores = {}
+    for p in answers:
+        minutes = DISTANCE_TO_MINUTES[p["walking_distance"]]
+        weight = p["walking_distance_importance"]
+        walking_minutes_scores[minutes] = walking_minutes_scores.get(minutes, 0) + weight
+
     df_walk = pd.DataFrame({
-        "Walking Distance (m)": [int(group_walking_radius)],
-        "Label": ["Group Average"]
-        })
+        "Walking Minutes": [f"{m} min" for m in walking_minutes_scores.keys()],
+        "Weighted Importance": list(walking_minutes_scores.values())
+    })
 
-    walk_chart = alt.Chart(df_walk).mark_bar().encode(
-        x="Walking Distance (m):Q",
-        y=alt.Y("Label:N", sort=None),
-        color=alt.value("#4C72B0")
-        )
-
-    st.altair_chart(walk_chart, use_container_width=True)
+    walk_pie = alt.Chart(df_walk).mark_arc().encode(
+        theta="Weighted Importance:Q",
+        color="Walking Minutes:N",
+        tooltip=["Walking Minutes:N", "Weighted Importance:Q"]
+    )
+    st.altair_chart(walk_pie, use_container_width=True)
 
     st.markdown("---")
 
-
-    # MACHINE LEARNING – GROUP PROFILE CLUSTERING
+    # ------------------------------------------
+    # MACHINE LEARNING CLUSTERING
+    # ------------------------------------------
     group_vector = build_group_feature_vector(answers)
     register_group_profile(group_vector)
 
@@ -786,10 +741,7 @@ def group_taste_profile(answers):
     labels, centers, current_label = cluster_group_profiles()
 
     if labels is None:
-        st.info(
-            "Not enough past dinners to compare group taste profiles yet. "
-            "After you have used the app for multiple dinners, I'll start recognising recurring group types."
-        )
+        st.info("Not enough past dinners yet — clustering will start after more sessions.")
     else:
         center = centers[current_label]
         name, explanation, details = describe_cluster_center(center)
@@ -800,11 +752,14 @@ def group_taste_profile(answers):
         )
         st.write(explanation)
 
-        # Store for other pages (e.g. API page)
         st.session_state["current_group_cluster_id"] = int(current_label)
         st.session_state["current_group_cluster_name"] = name
 
     if st.button("Find matching Restaurants!"):
         st.session_state["page"] = "api"
         st.rerun()
+
+
+
+
 
