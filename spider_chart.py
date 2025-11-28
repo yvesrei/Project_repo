@@ -593,7 +593,8 @@ def group_taste_profile(answers):
     st.header("Results Summary")
 
     # ---- BUDGET CALCULATION ----
-    budget_dict = {"$": 1, "$$": 2, "$$$": 3}
+    budget_dict = {"$": 1, "$$": 2, "$$$": 3, "$$$$": 4}
+
     budget_scores = []
     budget_weights = []
 
@@ -606,7 +607,8 @@ def group_taste_profile(answers):
     group_budget = sum(budget_scores) / sum(budget_weights)
     rounded_budget = round(group_budget)
 
-    reverse_budget_dict = {1: "$", 2: "$$", 3: "$$$"}
+    reverse_budget_dict = {1: "$", 2: "$$", 3: "$$$", 4: "$$$$"}
+
     budget_symbol_group = reverse_budget_dict.get(rounded_budget, "$")
 
     st.session_state["group_budget_numeric"] = str(rounded_budget)
