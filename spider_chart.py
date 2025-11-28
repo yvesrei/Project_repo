@@ -24,16 +24,10 @@ CUISINES = [
     "Seafood & Sushi"
 ]
 
-DINING_STYLES = [
-    "Takeaway",
-    "Casual",
-    "A la carte",
-    "Set Menu / Chef's Menu",
-    "Date Night",
-]
 
-EXPECTED_DIM = 4 + len(CUISINES) + len(DINING_STYLES)
-BUDGET_DICT = {"$": 1, "$$": 2, "$$$": 3}
+
+EXPECTED_DIM = 5 + len(CUISINES)
+BUDGET_DICT = {"$": 1, "$$": 2, "$$$": 3, "$$$$": 4}
 REVERSE_BUDGET_DICT = {v: k for k, v in BUDGET_DICT.items()}
 
 DATA_FILE = Path("group_profiles.csv")
@@ -43,10 +37,10 @@ def build_group_feature_vector(answers):
     """
     Build ONE numeric vector that represents the entire group.
     Uses:
-    - weighted average budget (numeric)
+    - weighted average budget
+    - weighted walking distance (meters)
     - average importances
-    - normalized cuisine score distribution (from ranks)
-    - normalized dining style distribution (weighted by importance)
+    - normalized cuisine score distribution
     """
     if not answers:
         return None
@@ -63,43 +57,51 @@ def build_group_feature_vector(answers):
 
     group_budget_numeric = sum(budget_scores) / sum(budget_weights)
 
-    # ---- importances: averages ----
+    # ---- walking distance ----
+    DISTANCE_DICT = {
+        "5 minutes": 500,
+        "10 minutes": 900,
+        "15 minutes": 1400,
+        "No preference": 3000
+    }
+
+    walking_scores = []
+    walking_weights = []
+
+    for p in answers:
+        walk_radius = DISTANCE_DICT[p["walking_distance"]]
+        imp = p["walking_distance_importance"]
+        walking_scores.append(walk_radius * imp)
+        walking_weights.append(imp)
+
+    group_walking_radius = sum(walking_scores) / sum(walking_weights)
+
+    # ---- importances averages ----
     budget_imp_avg = np.mean([p["budget_importance"] for p in answers])
     cuisine_imp_avg = np.mean([p["cuisine_importance"] for p in answers])
-    dining_imp_avg = np.mean([p["dining_style_importance"] for p in answers])
+    walking_imp_avg = np.mean([p["walking_distance_importance"] for p in answers])
 
-    # ---- cuisine scores (same idea as in group_taste_profile) ----
+    # ---- cuisine scores ----
     cuisine_scores = Counter()
     for p in answers:
         ranked = p["ranked_cuisines"]
         for i, cuisine in enumerate(ranked):
-            weight = 3 - i  # rank1=3, rank2=2, rank3=1
+            weight = 3 - i   # rank1=3, rank2=2, rank3=1
             cuisine_scores[cuisine] += weight
 
     cuisine_vec = [cuisine_scores.get(c, 0) for c in CUISINES]
     total_cuisine = sum(cuisine_vec) or 1
     cuisine_vec_norm = [x / total_cuisine for x in cuisine_vec]
 
-    # ---- dining style distribution (weighted by importance) ----
-    dining_counts = Counter()
-    for p in answers:
-        style = p["dining_style"]
-        imp = p["dining_style_importance"]
-        dining_counts[style] += imp
-
-    dining_vec = [dining_counts.get(s, 0) for s in DINING_STYLES]
-    total_dining = sum(dining_vec) or 1
-    dining_vec_norm = [x / total_dining for x in dining_vec]
-
-    # ---- final group vector ----
-    features = [
+    return np.array([
         group_budget_numeric,
+        group_walking_radius,
         budget_imp_avg,
         cuisine_imp_avg,
-        dining_imp_avg,
-    ] + cuisine_vec_norm + dining_vec_norm
+        walking_imp_avg,
+        *cuisine_vec_norm
+    ], dtype=float)
 
-    return np.array(features, dtype=float)
 
 def generate_synthetic_group_profiles(n=50):
     """
@@ -301,25 +303,23 @@ def generate_synthetic_group_profiles(n=50):
         budget_numeric = np.clip(rng.normal(a["budget_mean"], 0.25), 1.0, 3.0)
         budget_imp = np.clip(rng.normal(a["budget_imp_mean"], 0.4), 1.0, 3.0)
         cuisine_imp = np.clip(rng.normal(a["cuisine_imp_mean"], 0.4), 1.0, 3.0)
-        dining_imp = np.clip(rng.normal(a["dining_imp_mean"], 0.4), 1.0, 3.0)
+        
 
         # Sample cuisine distribution from a Dirichlet around the archetype preferences
         cuisine_alpha = pref_to_array(a["cuisine_pref"], CUISINES) * 8.0
         cuisine_vec = rng.dirichlet(cuisine_alpha)
 
         # Sample dining style distribution
-        dining_alpha = pref_to_array(a["dining_pref"], DINING_STYLES) * 8.0
-        dining_vec = rng.dirichlet(dining_alpha)
-
         vec = [
             budget_numeric,
+            1000,  # average walking radius placeholder
             budget_imp,
             cuisine_imp,
-            dining_imp,
-            *cuisine_vec,
-            *dining_vec,
-        ]
+            2.0,   # walking importance placeholder
+            *cuisine_vec
+            ]
         vectors.append(vec)
+
 
     return vectors
 
@@ -440,13 +440,15 @@ def describe_cluster_center(center):
     """Turn a cluster center vector into a human-readable name + description."""
     n_cuisines = len(CUISINES)
 
+    # Unpack feature vector
     budget_numeric = center[0]
-    budget_imp, cuisine_imp, dining_imp = center[1:4]
+    walking_radius = center[1]
+    budget_imp, cuisine_imp, walking_imp = center[2:5]
 
-    cuisine_vec = center[4:4 + n_cuisines]
-    dining_vec = center[4 + n_cuisines:]
+    # Cuisine distribution
+    cuisine_vec = center[5:5 + n_cuisines]
 
-    # top cuisine(s)
+    # Top cuisines
     top_cuisine_idx = int(np.argmax(cuisine_vec))
     top_cuisine = CUISINES[top_cuisine_idx]
 
@@ -456,124 +458,104 @@ def describe_cluster_center(center):
         second_cuisine_idx = top_cuisine_idx
     second_cuisine = CUISINES[second_cuisine_idx]
 
-    # top dining style
-    top_dining_idx = int(np.argmax(dining_vec))
-    top_dining = DINING_STYLES[top_dining_idx]
+    # Determine most important dimension
+    vals = {
+        "budget": float(budget_imp),
+        "cuisine": float(cuisine_imp),
+        "walking": float(walking_imp),
+    }
+    main_importance = max(vals, key=vals.get)
 
-    def importance_main():
-        vals = {
-            "budget": float(budget_imp),
-            "cuisine": float(cuisine_imp),
-            "dining": float(dining_imp),
-        }
-        return max(vals, key=vals.get)
+    # ==========================================
+    # CLUSTER NAMING LOGIC (UPDATED)
+    # ==========================================
 
-    main_importance = importance_main()
+    name = "Balanced Whatever-Works Group"
+    explanation = "Your group is flexible without strong extremes."
 
-    # --------- naming logic based on our archetypes ---------
-        # --------- naming logic based on new 10 cuisine groups ---------
-    name = "Chill Whatever-Works Group"
-    explanation = (
-        "Balanced preferences without strong extremes. Your group is flexible across all dimensions."
-    )
-
-    # Cheap & Cheerful Squad
-    if budget_numeric <= 1.6 and main_importance == "budget" and top_dining in ["Takeaway", "Casual"]:
+    # -------- Cheap & Cheerful Squad --------
+    # OLD LOGIC used: low budget + casual dining styles
+    # NEW LOGIC: low budget + short walking distance OR budget importance high
+    if budget_numeric <= 1.6 and main_importance == "budget":
         name = "Cheap & Cheerful Squad"
         explanation = (
-            "Your group strongly prioritises a low budget and leans towards relaxed, casual places. "
-            "Cuisine is flexible as long as it’s affordable and easy-going."
+            "Your group strongly prioritises a low budget and prefers easy, nearby options. "
+            "Cuisine is flexible as long as it's affordable and convenient."
         )
 
-    # Foodie Experience Hunters
-    elif budget_numeric >= 2.4 and main_importance in ["cuisine", "dining"] and top_dining in [
-        "A la carte", "Set Menu / Chef's Menu", "Date Night"
-    ]:
+    # -------- Foodie Experience Hunters --------
+    # OLD LOGIC used: $$$ dining styles + high cuisine/dining importance
+    # NEW LOGIC: high budget + high cuisine importance + willing to walk far
+    elif budget_numeric >= 2.4 and main_importance in ["cuisine"] and walking_radius > 900:
         name = "Foodie Experience Hunters"
         explanation = (
-            "Your group is willing to spend more for a memorable dining experience. "
-            "Cuisine and ambience are highly valued."
+            "Your group is willing to spend more and walk further for a memorable dining experience. "
+            "Cuisine quality matters the most."
         )
 
-    # --------- cuisine-driven clusters (new 10 categories) ---------
+    # -------- Cuisine-driven clusters (unchanged) --------
 
-    # Italian Comfort Crowd
     elif top_cuisine == "Italian":
         name = "Italian Comfort Crowd"
         explanation = (
-            "Your group loves classic Italian comfort — pasta, pizza, trattorias or modern Italian kitchens. "
-            "Warm, familiar flavours feel just right."
+            "Your group loves classic Italian comfort — pasta, pizza, trattorias or modern Italian kitchens."
         )
 
-    # Asian Craving Crew
     elif top_cuisine == "Asian":
         name = "Asian Craving Crew"
         explanation = (
-            "Your group has a clear preference for Asian flavours — whether it’s sushi, ramen, Thai or Chinese. "
-            "Bold flavours and variety matter most tonight."
+            "Your group clearly prefers Asian flavours — sushi, ramen, Thai, Chinese, or fusion."
         )
 
-    # Local Traditionalists
     elif top_cuisine == "Swiss / Alpine":
         name = "Local Traditionalists"
         explanation = (
-            "Your group leans toward Swiss and Alpine favourites — classic comfort food and familiar dishes."
+            "Your group leans toward Swiss and Alpine favourites — classic comfort food with local roots."
         )
 
-    # Mediterranean Lovers
     elif top_cuisine == "Mediterranean":
         name = "Mediterranean Lovers"
         explanation = (
-            "Your group prefers Mediterranean flavours — Greek, Spanish, Italian influence or coastal dishes. "
-            "Warm, shareable, comforting foods define your taste."
+            "Your group enjoys Mediterranean flavours — Greek, Spanish, Italian influence or coastal dishes."
         )
 
-    # All-American Crowd
     elif top_cuisine == "American":
         name = "All-American Crowd"
         explanation = (
-            "Your group enjoys American-style food — burgers, BBQ, diners or steakhouses. "
-            "Hearty, satisfying meals matter most tonight."
+            "Your group enjoys American-style food — burgers, BBQ, diners or steakhouses."
         )
 
-    # Middle Eastern Enthusiasts
     elif top_cuisine == "Middle Eastern":
         name = "Middle Eastern Enthusiasts"
         explanation = (
-            "Your group is drawn to Middle Eastern flavours — Lebanese, Persian or Arabic dishes. "
-            "You enjoy rich spices, grills, mezze and warm hospitality."
+            "Your group is drawn to Middle Eastern flavours — grills, mezze, spices, and warm hospitality."
         )
 
-    # Latin American Heat Seekers
     elif top_cuisine == "Latin American":
         name = "Latin American Heat Seekers"
         explanation = (
-            "Your group loves the vibrant variety of Latin American cuisines — Mexican, Brazilian or Peruvian."
+            "Your group loves vibrant Latin American flavours — Mexican, Brazilian, Peruvian or fusion."
         )
 
-    # Indian / South Asian Spice Lovers
     elif top_cuisine == "Indian / South Asian":
         name = "South Asian Spice Lovers"
         explanation = (
-            "Your group clearly enjoys Indian or South Asian flavours — aromatic spices, curries and bold tastes."
+            "Your group clearly enjoys Indian or South Asian flavours — aromatic spices and bold tastes."
         )
 
-    # Plant-Based Preference Group
     elif top_cuisine == "Vegetarian / Vegan":
         name = "Plant-Based Preference Group"
         explanation = (
-            "Your group shows a strong preference for vegetarian or vegan options — health-conscious and flavourful."
+            "Your group shows a strong preference for vegetarian or vegan options."
         )
 
-    # Seafood / Sushi Lovers
     elif top_cuisine == "Seafood & Sushi":
         name = "Seafood & Sushi Lovers"
         explanation = (
             "Your group gravitates towards seafood, sushi, and fresh ocean flavours."
         )
 
-
-    # budget level string
+    # Convert numeric budget back to a symbol
     budget_level = (
         "$" if budget_numeric < 1.5 else
         "$$" if budget_numeric < 2.5 else
@@ -584,11 +566,12 @@ def describe_cluster_center(center):
         "budget_level": budget_level,
         "main_cuisine": top_cuisine,
         "second_cuisine": second_cuisine,
-        "main_dining_style": top_dining,
         "main_importance_dimension": main_importance,
+        "walking_radius": int(walking_radius)
     }
 
     return name, explanation, details
+
 
 
 def group_taste_profile(answers):
@@ -643,44 +626,7 @@ def group_taste_profile(answers):
     st.session_state["group_budget_numeric"] = str(rounded_budget)
 
     
-    # Empty list gets created to store the dining_style scores.
-
-    dining_style_scores= []
-
-    # For each participant the chosen dining style gets muplitplied by the chosen importance for that style.
-    # Then the list gets extended with the dining style times the importance value.
-    # Example: Casual (importance = 2) --> "Casual" gets addded 2 times in the list.
-
-    for participant in answers:
-        
-        dining_style_value= participant["dining_style"]
-
-        dining_style_import = participant["dining_style_importance"]
-
-        dining_style_scores.extend([dining_style_value] * dining_style_import)
-
-    # Counts how many times each dining style appears (after weighting).
-
-    dining_counts = Counter(dining_style_scores)
-
-    # Gives us the weighted most common dining style of the list, by selecting the first one == the most common one.
-
     
-
-    # Counts the rank of the cuisine choices of the participants.
-    # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
-    # And gets the cuisine that has got the most points and stores it in "most_preferred_cuisine".
-    
-    
-
-    # Counts the rank of the cuisine choices of the participants.
-    # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
-    # And gets the cuisine that has got the most points and stores it in "most_preferred_cuisine".
-        # Counts how many times each dining style appears (after weighting).
-    dining_counts = Counter(dining_style_scores)
-
-    # Gives us the weighted most common dining style of the list
-    most_common_dining_style = dining_counts.most_common(1)[0][0]
 
     # Counts the rank of the cuisine choices of the participants.
     # Assigns values to ranks: rank 1 = 3 points, rank 2 = 2 points, rank 3 = 1 point.
@@ -701,6 +647,27 @@ def group_taste_profile(answers):
     # Save cuisine for the API
     st.session_state["group_cuisine"] = most_preferred_cuisine
 
+    # ---- WALKING DISTANCE GROUP RESULT ----
+    DISTANCE_DICT = {
+        "5 minutes": 500,
+        "10 minutes": 900,
+        "15 minutes": 1400,
+        "No preference": 3000
+        }
+
+    walking_scores = []
+    walking_weights = []
+
+    for p in answers:
+        walking_scores.append(DISTANCE_DICT[p["walking_distance"]] * p["walking_distance_importance"])
+        walking_weights.append(p["walking_distance_importance"])
+
+    group_walking_radius = sum(walking_scores) / sum(walking_weights)
+
+# Save walking result for API
+    st.session_state["group_walking_radius"] = int(group_walking_radius)
+
+
 
     
     # Summary metrics --> shows the three group Values in boxes.
@@ -710,7 +677,7 @@ def group_taste_profile(answers):
     with col2:
         st.metric("Top Cuisine", most_preferred_cuisine)
     with col3:
-        st.metric("Dining Style", most_common_dining_style)
+        st.metric("Walking Distance", f"{int(group_walking_radius)} m")
 
     st.markdown("---")
 
@@ -720,17 +687,17 @@ def group_taste_profile(answers):
 
     budget_importance_group = np.mean([p["budget_importance"] for p in answers])
     cuisine_importance_group = np.mean([p["cuisine_importance"] for p in answers])
-    dining_importance_group  = np.mean([p["dining_style_importance"] for p in answers])
-
+    walking_importance_group  = np.mean([p["walking_distance_importance"] for p in answers])
 
     df_radar = pd.DataFrame({
-    "category": ["Budget", "Cuisine", "Dining Style"],
-    "value": [
-        budget_importance_group,
-        cuisine_importance_group,
-        dining_importance_group
-        ]
-        })
+        "category": ["Budget", "Cuisine", "Walking Distance"],
+        "value": [
+            budget_importance_group,
+            cuisine_importance_group,
+            walking_importance_group
+            ]
+            })
+
 
 
     chart = alt.Chart(df_radar).mark_bar().encode(
@@ -767,30 +734,26 @@ def group_taste_profile(answers):
 
     st.markdown("---")
 
-    # ----------------------------------------------------
-    # DINING STYLE PIE CHART (Altair)
-    # ----------------------------------------------------
-        # ----------------------------------------------------
-    # DINING STYLE PIE CHART (Altair)
-    # ----------------------------------------------------
-    st.subheader("Dining Style Distribution (Weighted)")
+   # ------------------------------------------
+# WALKING DISTANCE DISTRIBUTION CHART
+# ------------------------------------------
+    st.subheader("Walking Distance Preferences (Weighted)")
 
-    if len(dining_counts) == 0:
-        st.info("No dining style data available.")
-    else:
-        df_pie = pd.DataFrame({
-            "Dining Style": list(dining_counts.keys()),
-            "Count": list(dining_counts.values())
+    df_walk = pd.DataFrame({
+        "Walking Distance (m)": [int(group_walking_radius)],
+        "Label": ["Group Average"]
         })
 
-        pie = alt.Chart(df_pie).mark_arc().encode(
-            theta="Count:Q",
-            color="Dining Style:N"
+    walk_chart = alt.Chart(df_walk).mark_bar().encode(
+        x="Walking Distance (m):Q",
+        y=alt.Y("Label:N", sort=None),
+        color=alt.value("#4C72B0")
         )
 
-        st.altair_chart(pie, use_container_width=True)
+    st.altair_chart(walk_chart, use_container_width=True)
 
     st.markdown("---")
+
 
     # MACHINE LEARNING – GROUP PROFILE CLUSTERING
     group_vector = build_group_feature_vector(answers)

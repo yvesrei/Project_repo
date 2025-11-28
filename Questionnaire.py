@@ -28,7 +28,7 @@ def show_questionnaire():
 
         budget = st.selectbox(
             "Your budget preference",
-            options=["$","$$","$$$, $$$$"],
+            options=["$","$$","$$$", "$$$$"],
             index=None,
             placeholder="Please choose your budget",
             key=f"budget_{participant}"
