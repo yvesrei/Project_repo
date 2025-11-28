@@ -664,7 +664,7 @@ def group_taste_profile(answers):
 
     group_walking_radius = sum(walking_scores) / sum(walking_weights)
 
-# Save walking result for API
+    # Save walking result for API
     st.session_state["group_walking_radius"] = int(group_walking_radius)
 
 
