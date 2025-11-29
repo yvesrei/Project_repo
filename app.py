@@ -16,7 +16,7 @@ def show_api_results():
         st.error("Please go through the questionnaire and results page first.")
         return
 
-    # Meal type selector (breakfast / lunch / dinner)
+    # Allow the user to choose what kind of meal they are planning
     meal_choice = st.selectbox(
         "What kind of meal are you planning?",
         ["Breakfast", "Lunch", "Dinner"],
@@ -51,21 +51,12 @@ def show_api_results():
          "St. Gallen", "Lugano", "Bern", "Luzern"]
     )
 
-    # Let the user control max walking distance (0.5km–5km, default 2.5km)
-    radius = st.slider(
-        "Maximum walking distance (in meters)",
-        min_value=500,
-        max_value=5000,
-        value=2500,
-        step=250,
-    )
-    
     # Page title for the restaurant results view
     st.title(f"Matching Restaurants in {city} for {meal_choice}!")
 
     results = api_access(
         city=city,
-        radius=radius,
+        radius=2000,
         budget_level=st.session_state["group_budget_numeric"],
         cuisine=st.session_state["group_cuisine"],
         open_at=open_at_timestamp,  # Ensure recommendations are actually open for the chosen meal slot
@@ -162,23 +153,67 @@ elif page == "questionnaire":
     # Questionnaire screen:
     # - Collects answers for the current participant
     # - Uses current_participant and num_of_participants from session_state
+
+    # Back navigation: go back to the main landing page.
+    col_home, col_prev_participant = st.columns(2)
+    with col_home:
+        if st.button("← Back to home"):
+            st.session_state["page"] = "home"
+            st.experimental_rerun()
+
+    # Back navigation between participants:
+    # If we are on participant N > 1, allow user to step back to N-1 and re-enter answers.
+    with col_prev_participant:
+        if st.session_state["current_participant"] > 1:
+            if st.button("← Back to previous participant"):
+                old_cp = st.session_state["current_participant"]
+                new_cp = old_cp - 1
+                st.session_state["current_participant"] = new_cp
+                # Truncate stored answers so the previous participant's data can be changed cleanly.
+                st.session_state["answers"] = st.session_state["answers"][:new_cp]
+                st.experimental_rerun()
+
     show_questionnaire()
 
 elif page == "result":
     # Result screen:
     # - Aggregates all participants' answers
     # - Computes and displays the group taste profile
+
+    # Back navigation: allow user to return to the questionnaire to adjust preferences.
+    if st.button("← Back to questionnaire"):
+        st.session_state["page"] = "questionnaire"
+        st.experimental_rerun()
+
     group_taste_profile(st.session_state["answers"])
 
 elif page == "api":
     # API results screen:
     # - Uses the computed group profile (budget, cuisine)
     # - Calls the external API (e.g. Yelp) and displays matching restaurants
+
+    # Back navigation: let user move back to the result page or questionnaire.
+    col_back_result, col_back_questionnaire = st.columns(2)
+    with col_back_result:
+        if st.button("← Back to result"):
+            st.session_state["page"] = "result"
+            st.experimental_rerun()
+    with col_back_questionnaire:
+        if st.button("← Back to questionnaire"):
+            st.session_state["page"] = "questionnaire"
+            st.experimental_rerun()
+
     show_api_results()
 
 elif page == "about":
     # About screen:
     # - Static information about the app, authors, or context
+
+    # Back navigation: go back to the main landing page.
+    if st.button("← Back to home"):
+        st.session_state["page"] = "home"
+        st.experimental_rerun()
+
     show_about_us()
 
 else:
