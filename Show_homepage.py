@@ -31,9 +31,9 @@ def show_homepage():
         ## This button checks if the user has inserted a valid number of participants.
         # If the user hasn't it will display an Error message
         # If the user has inserted a valdi value, the st.session_state is set to "questionnaire" --> page questionnaire is displayed
-    if st.button("Set up dinner"):
+    if st.button("Set up meal"):
         if num_of_part is None:
-                st.warning("Please select a number of participants for your dinner")
+                st.warning("Please select a number of participants for your meal")
                 st.stop
         else:
                 st.session_state["page"] = "questionnaire"
