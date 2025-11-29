@@ -147,11 +147,13 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
             return []
         businesses = data.get("businesses", [])
 
-        # EXCLUDE restaurants with rating below / equal 4.0 and with fewer than 20 reviews.
-        # We only keep businesses where rating > 4.0 AND review_count >= 20.
+        # EXCLUDE restaurants with rating below 3.5 and with fewer than 0 reviews.
+        # We only keep businesses where rating >= 3.5 AND review_count >= 0.
+        # This ensures we only show reasonably rated places. However, we had to loosen up the
+        # filter conditions as most restaurants have few review on Yelp.
         businesses = [
             b for b in businesses
-            if (b.get("rating") or 0) > 4.0 and (b.get("review_count") or 0) >= 20
+            if (b.get("rating") or 0) >= 3.5 and (b.get("review_count") or 0) >= 0
         ]
         return businesses
 
