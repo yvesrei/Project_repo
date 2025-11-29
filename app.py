@@ -51,15 +51,24 @@ def show_api_results():
          "St. Gallen", "Lugano", "Bern", "Luzern"]
     )
 
+    # Let the user choose the maximum walking distance (radius for Yelp in meters)
+    radius = st.slider(
+        "Maximum walking distance (in meters)",
+        min_value=500,
+        max_value=5000,
+        value=2500,
+        step=250,
+    )
+
     # Page title for the restaurant results view
     st.title(f"Matching Restaurants in {city} for {meal_choice}!")
 
     results = api_access(
         city=city,
-        radius=2000,
+        radius=radius,
         budget_level=st.session_state["group_budget_numeric"],
         cuisine=st.session_state["group_cuisine"],
-        open_at=open_at_timestamp,  # Ensure recommendations are actually open for the chosen meal slot
+        open_at=open_at_timestamp,  # Time constraint is now “soft” – api_client will drop it if it kills all results
     )
 
     # Handle the case where no restaurants are returned
@@ -159,7 +168,7 @@ elif page == "questionnaire":
     with col_home:
         if st.button("← Back to home"):
             st.session_state["page"] = "home"
-            st.rerun()  # Updated: experimental_rerun -> rerun
+            st.rerun()
 
     # Back navigation between participants:
     # If we are on participant N > 1, allow user to step back to N-1 and re-enter answers.
@@ -171,7 +180,7 @@ elif page == "questionnaire":
                 st.session_state["current_participant"] = new_cp
                 # Truncate stored answers so the previous participant's data can be changed cleanly.
                 st.session_state["answers"] = st.session_state["answers"][:new_cp]
-                st.rerun()  # Updated: experimental_rerun -> rerun
+                st.rerun()
 
     show_questionnaire()
 
@@ -183,7 +192,7 @@ elif page == "result":
     # Back navigation: allow user to return to the questionnaire to adjust preferences.
     if st.button("← Back to questionnaire"):
         st.session_state["page"] = "questionnaire"
-        st.rerun()  # Updated: experimental_rerun -> rerun
+        st.rerun()
 
     group_taste_profile(st.session_state["answers"])
 
@@ -197,11 +206,11 @@ elif page == "api":
     with col_back_result:
         if st.button("← Back to result"):
             st.session_state["page"] = "result"
-            st.rerun()  # Updated: experimental_rerun -> rerun
+            st.rerun()
     with col_back_questionnaire:
         if st.button("← Back to questionnaire"):
             st.session_state["page"] = "questionnaire"
-            st.rerun()  # Updated: experimental_rerun -> rerun
+            st.rerun()
 
     show_api_results()
 
@@ -212,7 +221,7 @@ elif page == "about":
     # Back navigation: go back to the main landing page.
     if st.button("← Back to home"):
         st.session_state["page"] = "home"
-        st.rerun()  # Updated: experimental_rerun -> rerun
+        st.rerun()
 
     show_about_us()
 

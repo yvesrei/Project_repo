@@ -1,10 +1,9 @@
 import streamlit as st
 import requests
 
-
 API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApBVkLwVfkNqR0v6X9K8DcuyqZBycjrPixxx9-DQen0SeR0Qp2yjaTD4UlaXYx"
 
-# Cuisine mapping system
+#Cuisine mapping system
 CUISINE_MAPPING = {
     "Italian": ["italian", "pizza", "pasta", "trattoria", "brasserie", "bistro"],
     "Asian": ["asian", "thai", "chinese", "szechuan", "cantonese", "japanese",
@@ -25,7 +24,6 @@ CUISINE_MAPPING = {
                            "glutenfree"],
     "Seafood & Sushi": ["seafood", "fish", "sushi", "fishmarket"]
 }
-
 def map_yelp_category(yelp_categories):
     yelp_categories = [c.lower() for c in yelp_categories]
     for simple, detailed_list in CUISINE_MAPPING.items():
@@ -33,13 +31,11 @@ def map_yelp_category(yelp_categories):
             if d in yelp_categories:
                 return simple
     return "International"
-
-
 # Coordinates for Zurich (BY NOW we ONLY search around this location)
 ZURICH_LAT = 47.3769
 ZURICH_LON = 8.5417
 
-# We now support the 9 biggest Swiss cities (by population) as search centers,
+# We now  support the 9 biggest Swiss cities (by population) as search centers,
 # using their main train station or an equivalent central point as the reference
 # for the radius feature. Multiple common spellings are mapped to the same coords.
 CITY_COORDS = {
@@ -151,7 +147,7 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
             return []
         businesses = data.get("businesses", [])
 
-        # EXCLUDE restaurants with rating <= 4.0 or with fewer than 20 reviews.
+        # EXCLUDE restaurants with rating below / equal 4.0 and with fewer than 20 reviews.
         # We only keep businesses where rating > 4.0 AND review_count >= 20.
         businesses = [
             b for b in businesses
@@ -159,33 +155,57 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         ]
         return businesses
 
-    # Base search parameters
-    params = {
+    # Base search parameters: strict filter (Zurich + radius + cuisine + price)
+    # Additional: we now use the resolved coordinates of one of the 9 biggest Swiss cities
+    # (by population) as the center of the radius search, with Zurich as the default fallback.
+    base_params = {
         "latitude": latitude,
         "longitude": longitude,
         "radius": radius,
+        # "open_at": open_at,          # time-based filter (added conditionally below)
         "categories": cuisine.lower(),
         "price": str(int(budget_level)),
         "limit": 50,
     }
     if open_at is not None:
-        params["open_at"] = open_at
+        # First, try to respect the meal time. If that leads to no results, we will
+        # later rerun the same search logic without this key.
+        base_params["open_at"] = open_at
 
+    # Helper: run the standard “strict/relaxed on price & cuisine” chain,
+    # optionally with or without open_at.
+    def run_search_chain(include_time: bool):
+        params = base_params.copy()
+        if not include_time:
+            params.pop("open_at", None)
 
-    # First attempt: strict search using both cuisine and price filters
-    businesses = search(params)
-
-    # Second attempt: if no results, drop the price filter (budget),
-    # keeping cuisine and location. This increases the chance of getting some hits.
-    if not businesses:
-        params.pop("price", None)
+        # First attempt: strict search using both cuisine and price filters
         businesses = search(params)
 
-    # Third attempt: if still no results, drop the cuisine filter as well,
-    # leaving only location + radius. This is a "last resort" to show something.
-    if not businesses:
-        params.pop("categories", None)
-        businesses = search(params)
+        # Second attempt: if no results, drop the price filter (budget),
+        # keeping cuisine and location.
+        if not businesses:
+            p2 = params.copy()
+            p2.pop("price", None)
+            businesses = search(p2)
+
+        # Third attempt: if still no results, drop the cuisine filter as well,
+        # leaving only location + radius.
+        if not businesses:
+            p3 = params.copy()
+            p3.pop("price", None)
+            p3.pop("categories", None)
+            businesses = search(p3)
+
+        return businesses
+
+    # 1) Run full chain WITH time constraint (open_at)
+    businesses = run_search_chain(include_time=True)
+
+    # 2) If still no businesses and we had open_at, rerun WITHOUT time constraint.
+    #    This is where we “loosen” opening times while keeping rating and cuisine strict.
+    if not businesses and open_at is not None:
+        businesses = run_search_chain(include_time=False)
 
     # We only want to show up to 5 restaurants in the UI (user interface), even if Yelp returns more.
     businesses = businesses[:5]
@@ -218,13 +238,15 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
                 detail = {}
 
         # Prefer detail endpoint fields, but fall back to search results if missing.
+        # This ensures we always have something sensible to show in the UI.
         name = detail.get("name") or b.get("name")
         rating = detail.get("rating") or b.get("rating")
         rating_emoji = rating_to_emoji(rating)
         phone = detail.get("display_phone") or b.get("display_phone")
         url = detail.get("url") or b.get("url")
 
-        # Construct address string
+        # Construct a single address string from the location object.
+        # We filter out None values and join the remaining parts by commas.
         location = detail.get("location") or b.get("location", {})
         address_parts = [
             location.get("address1"),
@@ -235,33 +257,47 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         ]
         address = ", ".join([part for part in address_parts if part])
 
-        # Primary image and additional photos
+        # Primary image and additional photos pulled from Yelp.
         primary_image_url = detail.get("image_url") or b.get("image_url")
         photos = detail.get("photos") or []
 
-        # Opening hours
+        # --- Opening hours block ---
+        # Yelp returns hours as a list of "open" entries with:
+        # - day (0–6)
+        # - start/end times as "HHMM" strings (e.g. "1100" for 11:00)
+        # We convert that structure into a human-readable multi-line string,
+        # like:
+        #   Mon: 11:00–22:00
+        #   Tue: 11:00–22:00
         opening_hours = None
         hours_list = detail.get("hours")
         if hours_list:
+            # Use the first hours object (index 0) as Yelp usually puts main hours there.
             open_entries = hours_list[0].get("open", [])
             lines = []
 
             for entry in open_entries:
+                # Map numeric day to label; fall back to raw number as string if unknown.
                 day = day_map.get(entry.get("day"), str(entry.get("day")))
                 start = entry.get("start", "")
                 end = entry.get("end", "")
 
+                # Convert "HHMM" format to "HH:MM" if we have exactly 4 chars.
                 if len(start) == 4:
                     start = f"{start[:2]}:{start[2:]}"
                 if len(end) == 4:
                     end = f"{end[:2]}:{end[2:]}"
 
+                # Build one line per opening interval
                 lines.append(f"{day}: {start}–{end}")
 
+            # Join all lines into a single multi-line string if we collected any
             if lines:
                 opening_hours = "\n".join(lines)
 
-        # Menu URL
+        # --- Menu URL block ---
+        # Menu information, if available, is typically stored under "attributes".
+        # We check multiple possible keys because Yelp may use different fields.
         attributes = detail.get("attributes", {}) or {}
         menu_url = (
             attributes.get("menu_url")
@@ -269,7 +305,11 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
             or None
         )
 
-        # Build normalized restaurant record
+        # Build the final normalized restaurant record that the Streamlit UI expects.
+        # This keeps all downstream display logic simple and consistent.
+        # Additional fields:
+        # - rating_emoji: quick emoji representation of the rating (for UI).
+        # - image_url / photos: image URLs from Yelp to display pictures of the restaurant.
         results.append({
             "name": name,
             "rating": rating,
