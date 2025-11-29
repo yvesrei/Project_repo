@@ -51,12 +51,21 @@ def show_api_results():
          "St. Gallen", "Lugano", "Bern", "Luzern"]
     )
 
+    # Let the user control max walking distance (0.5km–5km, default 2.5km)
+    radius = st.slider(
+        "Maximum walking distance (in meters)",
+        min_value=500,
+        max_value=5000,
+        value=2500,
+        step=250,
+    )
+    
     # Page title for the restaurant results view
     st.title(f"Matching Restaurants in {city} for {meal_choice}!")
 
     results = api_access(
         city=city,
-        radius=2000,
+        radius=radius,
         budget_level=st.session_state["group_budget_numeric"],
         cuisine=st.session_state["group_cuisine"],
         open_at=open_at_timestamp,  # Ensure recommendations are actually open for the chosen meal slot
