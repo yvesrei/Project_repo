@@ -1,5 +1,6 @@
 import streamlit as st
 from statistics import mode
+from datetime import datetime, time  # Needed to compute a concrete time-of-day for Yelp's open_at filter
 from Show_homepage import show_homepage
 from Questionnaire import show_questionnaire
 from spider_chart import group_taste_profile
@@ -15,6 +16,34 @@ def show_api_results():
         st.error("Please go through the questionnaire and results page first.")
         return
 
+    # Meal type selector (breakfast / lunch / dinner)
+    meal_choice = st.selectbox(
+        "What kind of meal are you planning?",
+        ["Breakfast", "Lunch", "Dinner"],
+    )
+
+    # For Yelp's open_at we must choose one representative time per meal.
+    # We pick times that sit in the middle of typical Swiss/European eating windows
+    # so that most places that offer that meal type are actually open.
+    MEAL_TIME_MAP = {
+        "Breakfast": time(9, 0),   # 09:00 ≈ typical breakfast/brunch time; cafés are usually open by then
+        "Lunch": time(13, 0),      # 13:00 sits in the middle of the common lunch service (around 12:00–14:00)
+        "Dinner": time(20, 0),     # 20:00 reflects a standard dinner hour; most kitchens are open 18:00–22:00
+    }
+
+    today = datetime.now()
+    meal_time = MEAL_TIME_MAP[meal_choice]
+    meal_dt = datetime(
+        year=today.year,
+        month=today.month,
+        day=today.day,
+        hour=meal_time.hour,
+        minute=meal_time.minute,
+    )
+    # Convert the chosen meal time on today's date into a Unix timestamp
+    # so Yelp can filter for places that are open at that specific moment.
+    open_at_timestamp = int(meal_dt.timestamp())
+
     # Let the user pick one of the supported cities
     city = st.selectbox(
         "Choose your city",
@@ -23,13 +52,14 @@ def show_api_results():
     )
 
     # Page title for the restaurant results view
-    st.title(f"Matching Restaurants in {city}!")
+    st.title(f"Matching Restaurants in {city} for {meal_choice}!")
 
     results = api_access(
         city=city,
         radius=2000,
         budget_level=st.session_state["group_budget_numeric"],
         cuisine=st.session_state["group_cuisine"],
+        open_at=open_at_timestamp,  # Ensure recommendations are actually open for the chosen meal slot
     )
 
     # Handle the case where no restaurants are returned

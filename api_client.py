@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-   
+
 API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApBVkLwVfkNqR0v6X9K8DcuyqZBycjrPixxx9-DQen0SeR0Qp2yjaTD4UlaXYx"
 
 # Cuisine mapping system
@@ -164,11 +164,13 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         "latitude": latitude,
         "longitude": longitude,
         "radius": radius,
-        # "open_at": open_at,          # Can be re-enabled if you want time-based filtering
         "categories": cuisine.lower(),
         "price": str(int(budget_level)),
         "limit": 50,
     }
+    if open_at is not None:
+        params["open_at"] = open_at
+
 
     # First attempt: strict search using both cuisine and price filters
     businesses = search(params)
