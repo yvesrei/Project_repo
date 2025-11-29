@@ -159,7 +159,7 @@ elif page == "questionnaire":
     with col_home:
         if st.button("← Back to home"):
             st.session_state["page"] = "home"
-            st.experimental_rerun()
+            st.rerun()  # Updated: experimental_rerun -> rerun
 
     # Back navigation between participants:
     # If we are on participant N > 1, allow user to step back to N-1 and re-enter answers.
@@ -171,7 +171,7 @@ elif page == "questionnaire":
                 st.session_state["current_participant"] = new_cp
                 # Truncate stored answers so the previous participant's data can be changed cleanly.
                 st.session_state["answers"] = st.session_state["answers"][:new_cp]
-                st.experimental_rerun()
+                st.rerun()  # Updated: experimental_rerun -> rerun
 
     show_questionnaire()
 
@@ -183,7 +183,7 @@ elif page == "result":
     # Back navigation: allow user to return to the questionnaire to adjust preferences.
     if st.button("← Back to questionnaire"):
         st.session_state["page"] = "questionnaire"
-        st.experimental_rerun()
+        st.rerun()  # Updated: experimental_rerun -> rerun
 
     group_taste_profile(st.session_state["answers"])
 
@@ -197,11 +197,11 @@ elif page == "api":
     with col_back_result:
         if st.button("← Back to result"):
             st.session_state["page"] = "result"
-            st.experimental_rerun()
+            st.rerun()  # Updated: experimental_rerun -> rerun
     with col_back_questionnaire:
         if st.button("← Back to questionnaire"):
             st.session_state["page"] = "questionnaire"
-            st.experimental_rerun()
+            st.rerun()  # Updated: experimental_rerun -> rerun
 
     show_api_results()
 
@@ -212,7 +212,7 @@ elif page == "about":
     # Back navigation: go back to the main landing page.
     if st.button("← Back to home"):
         st.session_state["page"] = "home"
-        st.experimental_rerun()
+        st.rerun()  # Updated: experimental_rerun -> rerun
 
     show_about_us()
 
