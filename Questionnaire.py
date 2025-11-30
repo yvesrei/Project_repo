@@ -39,23 +39,46 @@ def show_questionnaire():
         # The maximum number of selected types of cuisines is set to 3.
         # Gets stored in the personal key.
         # The ranking section only activates if exactly 3 cuisines have been selected.
+        # Every cuisine category that contains multiple cuisines includes an explanatory list in brackets.
 
-        type_of_cuisine= st.multiselect(
-              "Your cuisine preference",
-              options=["Italian",
-                       "Asian",
-                       "Swiss / Alpine",
-                       "Mediterranean",
-                       "American",
-                       "Middle Eastern",
-                       "Latin American",
-                       "Indian / South Asian",
-                       "Vegetarian / Vegan",
-                       "Seafood & Sushi"],
-              placeholder= "Please choose your prefered type of cuisine",
-              max_selections=3,
-              key=f"type_of_cuisine_{participant}")
-              
+        type_of_cuisine = st.multiselect(
+             "Your cuisine preference",
+             options=[
+                  "Italian",
+                  "Asian (Thai, Chinese, Japanese, Korean)",
+                  "Swiss / Alpine (Swiss, Austrian, German)",
+                  "Mediterranean (Greek, Spanish, Turkish, Portuguese)",
+                  "American",
+                  "Middle Eastern (Lebanese, Persian, Arabic, Persian)",
+                  "Latin American (Mexican, Peruvian, Brazilian, Argentinian)",
+                  "Indian / South Asian (Indian, Pakistani, Sri Lankan)",
+                  "Vegetarian / Vegan",
+                  "Seafood & Sushi"
+                  ],
+            placeholder="Please choose your preferred type of cuisine",
+            max_selections=3,
+            key=f"type_of_cuisine_{participant}"
+            )
+
+         # Map frontend labels back to the original internal category keys
+        CUISINE_LABEL_MAP = {
+              "Italian": "Italian",
+            "Asian (Thai, Chinese, Japanese, Korean)": "Asian",
+            "Swiss / Alpine (Swiss, Austrian, German)": "Swiss / Alpine",
+            "Mediterranean (Greek, Spanish, Turkish, Portuguese)": "Mediterranean",
+            "American": "American",
+            "Middle Eastern (Lebanese, Persian, Arabic, Persian)": "Middle Eastern",
+            "Latin American (Mexican, Peruvian, Brazilian, Argentinian)": "Latin American",
+            "Indian / South Asian (Indian, Pakistani, Sri Lankan)": "Indian / South Asian",
+            "Vegetarian / Vegan": "Vegetarian / Vegan",
+            "Seafood & Sushi": "Seafood & Sushi"
+            }
+
+         # Convert selected cuisine labels to your internal original keys
+        type_of_cuisine_internal = [
+             CUISINE_LABEL_MAP[c] for c in type_of_cuisine
+             ]
+   
               
         st.markdown("### Rank your selected cuisines (1 = most preferred):")
 
@@ -82,6 +105,10 @@ def show_questionnaire():
             st.write(f"Rank 3: {rank3}")
             
             ranked_cuisines = [rank1, rank2, rank3]
+
+             # Convert ranked cuisines to internal keys
+            ranked_cuisines_internal = [CUISINE_LABEL_MAP[c] for c in ranked_cuisines]
+
 
         else:
             ranked_cuisines = []
@@ -155,8 +182,8 @@ def show_questionnaire():
              st.session_state["answers"].append({
                  "budget": budget,
                  "budget_importance": budget_importance,
-                 "type_of_cuisine": type_of_cuisine,
-                 "ranked_cuisines": ranked_cuisines,
+                 "type_of_cuisine": type_of_cuisine_internal,
+                 "ranked_cuisines": ranked_cuisines_internal,
                  "cuisine_importance": cuisine_importance,
                  "walking_distance": walking_distance, 
                  "walking_distance_importance": walking_distance_importance
