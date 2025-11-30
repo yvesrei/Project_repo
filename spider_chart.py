@@ -245,6 +245,19 @@ def cluster_group_profiles():
     if len(vectors_list) < 20:
         vectors_list.extend(generate_synthetic_group_profiles(n=40))
 
+    # Save updated clean dataset back to CSV
+    try:
+        with DATA_FILE.open("w", newline="") as f:
+            writer = csv.writer(f)
+            for vec in vectors_list:
+                writer.writerow(vec)
+    except Exception as e:
+        st.warning(f"Could not update ML dataset: {e}")
+
+
+    
+
+
     X = np.array(vectors_list)
 
     # Run K-Means
