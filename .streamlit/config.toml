@@ -1,9 +1,20 @@
+
+# Streamlit theme configuration
+# ------------------------------------------------------------------------
+# This file defines the visual design of the FoodMingle app.
+# We started from a default Streamlit theme that we copied and adapted the colors,
+# fonts, and layout to match our custom Bordeaux/dark aesthetic.
+# ========================================================================
+
 [server]
 enableStaticServing = true
 
 # ==========================
 #        FONTS
 # ==========================
+# Custom fonts used throughout the app. These files are stored locally
+# in the /app/static directory and applied globally via Streamlit theming.
+
 [[theme.fontFaces]]
 family = "SpaceGrotesk"
 url = "app/static/SpaceGrotesk-VariableFont_wght.ttf"
@@ -35,6 +46,12 @@ weight = 400
 # ==========================
 #        THEME
 # ==========================
+# Main theme settings for the entire app that includes:
+# - Custom Bordeaux color palette
+# - Rounded components
+# - Typography configuration
+# - Chart colors
+
 [theme]
 # --- Color Palette ---
 primaryColor = "#6A0F19"              # Bordeaux accent
@@ -65,6 +82,8 @@ chartCategoricalColors = ["#0ea5e9", "#059669", "#fbbf24"]
 # ==========================
 #      SIDEBAR THEME
 # ==========================
+# The sidebar uses slightly darker tones to distinguish it from the main layout.
+
 [theme.sidebar]
 backgroundColor = "#300D12"                 # Darker Bordeaux tone
 secondaryBackgroundColor = "#1C1C1C"        # Dark grey

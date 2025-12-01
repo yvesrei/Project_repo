@@ -1,6 +1,12 @@
+# This is the main Streamlit app file
+#  Defines the navigation system (home, questionnaire, result, API, about)
+#  Manages session state (participants, answers, current page)
+#  Connects the UI to the external restaurant API
+
+
 import streamlit as st
 from statistics import mode
-from datetime import datetime, time  # Needed to compute a concrete time-of-day for Yelp's open_at filter
+from datetime import datetime, time  
 from Show_homepage import show_homepage
 from Questionnaire import show_questionnaire
 from spider_chart import group_taste_profile
@@ -108,7 +114,7 @@ def show_api_results():
 # to persist values across reruns so we know:
 # - which page the user is on,
 # - how many participants there are,
-# - which participant is currently answering,
+# - which participant is currently answering the questionnaire,
 # - and all collected answers so far.
 
 if "page" not in st.session_state:
@@ -155,12 +161,12 @@ if page == "home":
     # Home screen:
     # - Introduces the app
     # - Asks for number of participants
-    # - Provides entry point into the questionnaire flow
+    # - Provides entry point into the questionnaire
     show_homepage()
 
 elif page == "questionnaire":
     # Questionnaire screen:
-    # - Collects answers for the current participant
+    # - Collects all answers from the current participant
     # - Uses current_participant and num_of_participants from session_state
 
     # Back navigation: go back to the main landing page.
@@ -198,7 +204,7 @@ elif page == "result":
 
 elif page == "api":
     # API results screen:
-    # - Uses the computed group profile (budget, cuisine)
+    # - Uses the computed group profile values (budget, cuisine, walking distance(radius)
     # - Calls the external API (e.g. Yelp) and displays matching restaurants
 
     # Back navigation: let user move back to the result page or questionnaire.
@@ -216,7 +222,7 @@ elif page == "api":
 
 elif page == "about":
     # About screen:
-    # - Static information about the app, authors, or context
+    # - General information about the app, authors and context
 
     # Back navigation: go back to the main landing page.
     if st.button("← Back to home"):
