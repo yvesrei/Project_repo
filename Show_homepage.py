@@ -1,18 +1,24 @@
 import streamlit as st
 import os
+
+# Function renders the landing page (home) of the FoodMingle app.
+# It:
+# - shows the logo from the app
+# - Lets the host choose how many people will participate in the dinner and thereofe the questionnaire
+# - Provides additional navigation to the "about us" and "questionnaire" pages
+
 def show_homepage():
         
-        # Path to the logo inside your project
+        # Path to the logo image inside the folder "images"
     logo_path = os.path.join("Images", "FOODMINGLE_Final_Logo_TextMatch.png")
 
-    # Create 3 columns for centering
+     # Use a 3 column layout to center the logo on the page
     left, center, right = st.columns([1, 2, 1])
-
     with center:
         st.image(logo_path, width=330)
         
 
-
+     # Main title of the homepage
     st.header("Welcome to FoodMingle!")
 
          
@@ -25,7 +31,7 @@ def show_homepage():
             index=None,
             placeholder="Please select a number"
         )
-        
+        # Save the selected number in the session state
     st.session_state["num_of_participants"] = num_of_part
         
         ## This button checks if the user has inserted a valid number of participants.
