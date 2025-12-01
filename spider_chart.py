@@ -539,6 +539,7 @@ def group_taste_profile(answers):
         name, explanation, details = describe_cluster_center(center)
     
          # Display the final “taste personality”
+         # Displays a green success message box in the streamlit app
         st.success(
             f"Tonight's group looks like: **{name}** "
             f"(Cluster {current_label + 1} of {len(set(labels))})"
