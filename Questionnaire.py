@@ -4,16 +4,26 @@ from statistics import mode
 
 def show_questionnaire():
         
-        ## Title displays which participant is currently answering the questionnaire.
+
+         ## Function displays the questionnaire for each participant.
+         # Each participant fills out :
+         # - His budget preference
+         # - His three cuisine preferences and ranks them by importance
+         # - His walking distance preference
+         # - His importance ranking of the three attributes
+         # Their answers get stored individually in the st.session_state
+         
+
+         ## Title displays which participant is currently answering the questionnaire.
         st.title(f"Participant {st.session_state['current_participant']}")
 
         participant=st.session_state['current_participant']
         
 
-        ## Initializes for each participant the fields the first time they appear.
-        # These per-participant keys ensure that answers from previous participant. 
-        # are not shown again. Each participant has their own widget keys for example
-        # "budget_1", so Streamlit loads a fresh, empty state.
+         ## Initializes for each participant the fields the first time they appear.
+         # These per-participant keys ensure that answers from the previous participant
+         # are not shown again. Each participant has their own widget keys for example
+         # "budget_1", so Streamlit loads a fresh and empty state.
 
 
         if f"budget_{participant}" not in st.session_state:
@@ -35,7 +45,7 @@ def show_questionnaire():
         )
 
 
-        # This is a multiselect button, eg. the participant is able to choose 3 different type if cuisines.
+        # This is a multiselect button, eg. the participant is able to choose 3 different type of cuisines.
         # The maximum number of selected types of cuisines is set to 3.
         # Gets stored in the personal key.
         # The ranking section only activates if exactly 3 cuisines have been selected.
@@ -60,7 +70,8 @@ def show_questionnaire():
             key=f"type_of_cuisine_{participant}"
             )
 
-         # Map frontend labels back to the original internal category keys
+         # THis function maps frontend long labels from the multiselect button back to the original internal category keys.
+         # Therefore we keep the naming simple and clean.
         CUISINE_LABEL_MAP = {
               "Italian": "Italian",
             "Asian (Thai, Chinese, Japanese, Korean)": "Asian",
@@ -74,7 +85,7 @@ def show_questionnaire():
             "Seafood & Sushi": "Seafood & Sushi"
             }
 
-         # Convert selected cuisine labels to your internal original keys
+         # Here they get converted to the internal keys.
         type_of_cuisine_internal = [
              CUISINE_LABEL_MAP[c] for c in type_of_cuisine
              ]
@@ -82,10 +93,10 @@ def show_questionnaire():
               
         st.markdown("### Rank your selected cuisines (1 = most preferred):")
 
-        ## Ranking logic of the 3 selcted cuisines.
-        # The participant must rank his selected cuisines manually.
-        # Ranks are linked to each other. So Rank 2 options exclude the one chosen in rank 1.
-        # Rank 3 is auto assigned with what is left--> ensure that every rank is used.
+         ## Ranking logic of the 3 selcted cuisines.
+         # The participant must rank his selected cuisines manually.
+         # Ranks are linked to each other. So Rank 2 options exclude the one chosen in rank 1.
+         # Rank 3 is auto assigned with what is left--> ensure that every rank is used.
 
         if len(type_of_cuisine) == 3:
             rank1 = st.selectbox(
@@ -109,13 +120,13 @@ def show_questionnaire():
              # Convert ranked cuisines to internal keys
             ranked_cuisines_internal = [CUISINE_LABEL_MAP[c] for c in ranked_cuisines]
 
-
+         # Error message is displayed when not exactly 3 cuisines have been selected by the participant.
         else:
             ranked_cuisines = []
             st.warning("You must select exactly 3 cuisines to rank them!")
 
         
-        ## Selectbox where participant decides his preferred dining style.
+        ## Selectbox where participant decides his preferred walking distance.
         # Stored as well in a specific participant key.
 
         walking_distance = st.selectbox(
@@ -131,9 +142,9 @@ def show_questionnaire():
 
 
         ## The importance ranking system
-        # Each factor (budget, cuisine, dining style) must receive a unique importance value (1, 2, 3).
+        # Each factor (budget, cuisine, walking distance) must receive a unique importance value (1, 2, 3).
         # Each participant chooses 1–3 for budget, then the remaining values for cuisine,
-        # and the final value is automatically assigned to dining style. Same logic as before in the cuisine part.
+        # and the final value is automatically assigned to walking distance. Same logic as before in the cuisine part.
 
 
         budget_importance = st.selectbox(
