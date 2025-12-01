@@ -1,3 +1,15 @@
+## This file lists all Python packages required to run the FoodMingle Streamlit app
+# It tells Python which libraries the app needs to runn correctly.
+# When someone installs or runs the project, all packages listed here
+# are automatically installed, so the app works without problems everywhere.
+# It contains:
+# - Web UI (Streamlit)
+# - Data handling (pandas, numpy)
+# - Charts/visualizations (matplotlib, altair)
+# - API requests (requests)
+# - Clustering / simple machine learning (scikit-learn)
+
+
 streamlit
 pandas
 numpy
