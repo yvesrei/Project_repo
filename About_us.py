@@ -73,7 +73,7 @@ def show_about_us():
     # Center the horizontal image below the four vertical ones
     spacer_left, center_col, spacer_right = st.columns([1, 2, 1])
     with center_col:
-        st.image(horizontal_member["image"], use_column_width=True)
+        st.image(horizontal_member["image"], width=350)
         st.markdown(f"**{horizontal_member['name']}**")
         st.write(horizontal_member["role"])
         st.write(f"[{horizontal_member['email']}](mailto:{horizontal_member['email']})")
@@ -188,6 +188,16 @@ def render_timeline():
         )
 
     st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div style="width: 100%; text-align: center; margin: 20px 0;">
+            <span style="font-size: 28px;">🍽️</span>
+        </div>
+        <hr style="border: 1px solid #555555; margin-top: 10px; margin-bottom: 30px;">
+        """,
+        unsafe_allow_html=True
+    )
+    st.markdown("<br><br><br>", unsafe_allow_html=True)
     st.markdown("### A Final Message from Us")
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown(
