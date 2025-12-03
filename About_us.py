@@ -67,127 +67,106 @@ def show_about_us():
             st.write(member["role"])
             st.write(f"[{member['email']}](mailto:{member['email']})")
 
-            # --- Project timeline section ---
-    st.markdown("### Our Journey")
+# ---- Timeline section ----
+    st.markdown("Our Journey!")
+    render_timeline()
 
-    st.markdown(
-        """
-        **October**
+def render_timeline():
+    # CSS styles for the vertical timeline
+    timeline_css = """
+    <style>
+    .timeline {
+        position: relative;
+        margin: 2rem 0;
+        padding-left: 24px;
+    }
+    .timeline::before {
+        content: "";
+        position: absolute;
+        left: 12px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e0e0e0;
+    }
+    .timeline-month {
+        font-weight: 700;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.2rem;
+    }
+    .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: 4px;
+        top: 4px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 2px solid #ff4b4b;
+    }
+    .timeline-date {
+        font-weight: 600;
+        margin-left: 24px;
+    }
+    .timeline-content {
+        margin-left: 24px;
+        color: #444444;
+    }
+    </style>
+    """
 
-        - **10 October** – Initial idea and first brainstorming session  
-        - **28 October** – Finalized the FOODMINGLE concept and overall structure  
+    st.markdown("### Our Journey", unsafe_allow_html=True)
+    st.markdown(timeline_css, unsafe_allow_html=True)
 
-        **November**
+    # Define the events in order
+    events = [
+        {"month": "October", "date": "10 October",
+        "text": "Initial idea and first brainstorming session."},
+        {"month": "October", "date": "28 October",
+        "text": "Finalized the FOODMINGLE concept and overall structure."},
+        {"month": "November", "date": "7 November",
+        "text": "Split the team into frontend, backend/logic, and presenting roles."},
+        {"month": "November", "date": "9–15 November",
+        "text": "Built the basic questionnaire flow and first version of the taste profile logic."},
+        {"month": "November", "date": "15–20 November",
+        "text": "Connected the API logic and started mapping restaurant data to cuisines and atmospheres."},
+        {"month": "November", "date": "20–25 November",
+        "text": "Integrated the group taste profile with the spider charts and built the first full end-to-end version."},
+        {"month": "November", "date": "25 November",
+        "text": "First functioning version of the app."},
+        {"month": "November", "date": "26–30 November",
+        "text": "Polished the code, improved the UI, and worked on documentation and the About Us page."},
+        {"month": "December", "date": "1 December",
+        "text": "Final adjustments and finishing touches for the hand-in."},
+    ]
 
-        - **7 November** – Split the team into frontend, backend/logic, and presenting roles  
-        - **9–15 November** – Built the basic questionnaire flow and first version of the taste profile logic  
-        - **15–20 November** – Connected the API logic and started mapping restaurant data to cuisines and atmospheres  
-        - **20–25 November** – Integrated the group taste profile with the spider charts and built the first full end-to-end version  
-        - **25 November** – First functioning version of the app  
-        - **26–30 November** – Polished the code, improved the UI, and worked on documentation and the About Us page  
+    # Render the timeline with month headings and items
+    current_month = None
+    st.markdown('<div class="timeline">', unsafe_allow_html=True)
 
-        **December**
-
-        - **1 December** – Final adjustments and finishing touches for the hand-in  
-                """
-            )
-    
-    def render_timeline():
-        # CSS styles for the vertical timeline
-        timeline_css = """
-        <style>
-        .timeline {
-            position: relative;
-            margin: 2rem 0;
-            padding-left: 24px;
-        }
-        .timeline::before {
-            content: "";
-            position: absolute;
-            left: 12px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #e0e0e0;
-        }
-        .timeline-month {
-            font-weight: 700;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 1.2rem;
-        }
-        .timeline-item::before {
-            content: "";
-            position: absolute;
-            left: 4px;
-            top: 4px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 2px solid #ff4b4b;
-        }
-        .timeline-date {
-            font-weight: 600;
-            margin-left: 24px;
-        }
-        .timeline-content {
-            margin-left: 24px;
-            color: #444444;
-        }
-        </style>
-        """
-
-        st.markdown("### Our Journey", unsafe_allow_html=True)
-        st.markdown(timeline_css, unsafe_allow_html=True)
-
-        # Define the events in order
-        events = [
-            {"month": "October", "date": "10 October",
-            "text": "Initial idea and first brainstorming session."},
-            {"month": "October", "date": "28 October",
-            "text": "Finalized the FOODMINGLE concept and overall structure."},
-            {"month": "November", "date": "7 November",
-            "text": "Split the team into frontend, backend/logic, and presenting roles."},
-            {"month": "November", "date": "9–15 November",
-            "text": "Built the basic questionnaire flow and first version of the taste profile logic."},
-            {"month": "November", "date": "15–20 November",
-            "text": "Connected the API logic and started mapping restaurant data to cuisines and atmospheres."},
-            {"month": "November", "date": "20–25 November",
-            "text": "Integrated the group taste profile with the spider charts and built the first full end-to-end version."},
-            {"month": "November", "date": "25 November",
-            "text": "First functioning version of the app."},
-            {"month": "November", "date": "26–30 November",
-            "text": "Polished the code, improved the UI, and worked on documentation and the About Us page."},
-            {"month": "December", "date": "1 December",
-            "text": "Final adjustments and finishing touches for the hand-in."},
-        ]
-
-        # Render the timeline with month headings and items
-        current_month = None
-        st.markdown('<div class="timeline">', unsafe_allow_html=True)
-
-        for event in events:
-            # Print month heading once when it changes
-            if event["month"] != current_month:
-                current_month = event["month"]
-                st.markdown(
-                    f'<div class="timeline-month">{current_month}</div>',
-                    unsafe_allow_html=True
-                )
-
-            # Print the individual event
+    for event in events:
+        # Print month heading once when it changes
+        if event["month"] != current_month:
+            current_month = event["month"]
             st.markdown(
-                f'''
-                <div class="timeline-item">
-                    <div class="timeline-date">{event["date"]}</div>
-                    <div class="timeline-content">{event["text"]}</div>
-                </div>
-                ''',
+                f'<div class="timeline-month">{current_month}</div>',
                 unsafe_allow_html=True
             )
 
-        st.markdown('</div>', unsafe_allow_html=True)
+        # Print the individual event
+        st.markdown(
+            f'''
+            <div class="timeline-item">
+                <div class="timeline-date">{event["date"]}</div>
+                <div class="timeline-content">{event["text"]}</div>
+            </div>
+            ''',
+            unsafe_allow_html=True
+        )
+
+    st.markdown('</div>', unsafe_allow_html=True)
