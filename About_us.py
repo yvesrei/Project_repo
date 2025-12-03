@@ -65,7 +65,7 @@ def show_about_us():
     for i, member in enumerate(vertical_members):
         col = cols[i % 2]   # cycle through column 0 and 1
         with col:
-            st.image(member["image"], width=240)
+            st.image(member["image"], use_column_width=True)
             st.markdown(f"**{member['name']}**")
             st.write(member["role"])
             st.write(f"[{member['email']}](mailto:{member['email']})")
@@ -88,7 +88,7 @@ def render_timeline():
     <style>
     .timeline {
         position: relative;
-        margin: 2rem 0;
+        margin: 1rem 0;
         padding-left: 24px;
     }
     .timeline::before {
@@ -188,13 +188,12 @@ def render_timeline():
         )
 
     st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("### A Final Message from Us")
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown(
         """
-        We hope FOODMINGLE was able to make your group dinner plans a little easier and more fun.  
-        If you have ideas on how to improve the app or features you would love to see, we’d be happy to hear from you.  
-        Your feedback can help us refine the recommendations, improve the design, and maybe even bring FOODMINGLE to life beyond this course.  
-        Feel free to share what worked well for you and what didn’t quite hit the mark.  
+        We hope FOODMINGLE was able to make your group dinner plans a little easier and more fun. If you have ideas on how to improve the app or features you would love to see, we’d be happy to hear from you. Your feedback can help us refine the recommendations, improve the design, and maybe even bring FOODMINGLE to life beyond this course. Feel free to share what worked well for you and what didn’t quite hit the mark.  
         Thank you for trying FOODMINGLE and being part of our journey!
         """
     )
+# TODO: Alex – remember to update your own picture (Images/alexander.jpg).
