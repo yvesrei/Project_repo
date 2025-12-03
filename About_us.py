@@ -18,6 +18,7 @@ def show_about_us():
         *If choosing a restaurant takes longer than cooking the food, we consider that a societal emergency.*
         """
     )
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     st.markdown("### Our Team")
 
@@ -36,10 +37,10 @@ def show_about_us():
             "image": "Images/yves.jpg",
         },
         {
-            "name": "Raphael Loacker",
-            "role": "Coding",
-            "email": "raphael.loacker@student.unisg.ch",
-            "image": "Images/raphael.jpg",
+            "name": "Ian Pettenhofer",
+            "role": "Presenting",
+            "email": "ian.pettenhofer@student.unisg.ch",
+            "image": "Images/ian.jpg",
         },
         {
             "name": "Loris Häcki",
@@ -48,10 +49,10 @@ def show_about_us():
             "image": "Images/loris.jpg",
         },
         {
-            "name": "Ian Pettenhofer",
-            "role": "Presenting",
-            "email": "ian.pettenhofer@student.unisg.ch",
-            "image": "Images/ian.jpg",
+            "name": "Raphael Loacker",
+            "role": "Coding",
+            "email": "raphael.loacker@student.unisg.ch",
+            "image": "Images/raphael.jpg",
         },
     ]
 
@@ -68,7 +69,7 @@ def show_about_us():
             st.write(f"[{member['email']}](mailto:{member['email']})")
 
 # ---- Timeline section ----
-    st.markdown("Our Journey!")
+    st.markdown("<br><br>", unsafe_allow_html=True)
     render_timeline()
 
 def render_timeline():
@@ -115,13 +116,19 @@ def render_timeline():
     }
     .timeline-content {
         margin-left: 24px;
-        color: #444444;
+        color: #ffffff;
     }
     </style>
     """
 
     st.markdown("### Our Journey", unsafe_allow_html=True)
     st.markdown(timeline_css, unsafe_allow_html=True)
+
+    month_titles = {
+        "October": "October – Sprouting the seed",
+        "November": "November – Heavy lifting & sleepless nights",
+        "December": "December – Project in full bloom",
+    }
 
     # Define the events in order
     events = [
@@ -153,8 +160,9 @@ def render_timeline():
         # Print month heading once when it changes
         if event["month"] != current_month:
             current_month = event["month"]
+            month_label = month_titles.get(current_month, current_month)
             st.markdown(
-                f'<div class="timeline-month">{current_month}</div>',
+                f'<div class="timeline-month">{month_label}</div>',
                 unsafe_allow_html=True
             )
 
