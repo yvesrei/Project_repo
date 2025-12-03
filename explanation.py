@@ -1,53 +1,24 @@
-#Placeholder
-
-import openai
 import streamlit as st
-
-# Load API key (must be stored in Streamlit secrets)
-openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
 
 def generate_group_summary(taste_profile: dict) -> str:
     """
-    Creates a fun 2–3 sentence summary of the group's taste profile.
+    TEMP STUB:
+    Simple fake summary so we can check that page navigation works.
+    Replace with real OpenAI logic once everything is stable.
     """
-    prompt = f"""
-    Write a fun, friendly, humorous 3‑sentence summary of this group's food preferences.
-    Avoid formal tone. Be playful and creative.
-    Taste profile data: {taste_profile}
-    """
-
-    try:
-        response = openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=120,
-            temperature=0.9
-        )
-        return response.choices[0].message["content"].strip()
-    except Exception as e:
-        return f"(AI summary unavailable: {e})"
+    return (
+        "This is a temporary test summary of your group's food preferences. "
+        "If you are reading this, the AI integration is wired correctly and the app is running."
+    )
 
 def generate_restaurant_summary(restaurant: dict) -> str:
     """
-    Creates a playful 2–3 sentence description for a single restaurant.
-    Emphasizes vibe, cuisine, atmosphere, and fun commentary.
+    TEMP STUB:
+    Simple fake restaurant description so we can verify the AI hook is being called.
+    Replace with real OpenAI logic once everything is stable.
     """
-    prompt = f"""
-    Create a playful 2–3 sentence description of this restaurant.
-    Tone: fun, light, witty, maybe cheeky.
-    Mention why it could be a good fit for the group.
-    Restaurant details: {restaurant}
-    """
-
-    try:
-        response = openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=120,
-            temperature=0.95
-        )
-        return response.choices[0].message["content"].strip()
-    except Exception as e:
-        return f"(AI restaurant description unavailable: {e})"
-
-# TODO: Ensure all pages import from this module and pass correct dict formats.
+    name = restaurant.get("name", "this place")
+    return (
+        f"This is a temporary description for {name}. "
+        "Once the AI integration is fully configured, this text will be generated dynamically."
+    )
