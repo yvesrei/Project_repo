@@ -11,7 +11,11 @@ from Show_homepage import show_homepage
 from Questionnaire import show_questionnaire
 from spider_chart import group_taste_profile
 from About_us import show_about_us
+
+# Needed for AI implementation: Restaurant descriptions (Alex)
 from api_client import api_access
+# Needed for AI implementation: Restaurant descriptions (Alex)
+from explanation import generate_restaurant_summary
 
 
 # Display restaurant matches based on stored group results from spider web
@@ -105,6 +109,11 @@ def show_api_results():
 
         if r["menu_url"]:
             st.markdown(f"[Menu]({r['menu_url']})")
+
+        # === Needed for AI implementation: Restaurant Description (Alex) – START ===
+        ai_text = generate_restaurant_summary(r)
+        st.info(ai_text)
+        # === Needed for AI implementation: Restaurant Description (Alex) – END ===
 
         st.markdown("---")
 

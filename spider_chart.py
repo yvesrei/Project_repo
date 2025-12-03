@@ -6,8 +6,11 @@ from collections import Counter
 import altair as alt
 import pandas as pd
 from sklearn.cluster import KMeans
+
 from pathlib import Path  
 import csv               
+# Needed for AI implementation (group summary)
+from explanation import generate_group_summary
 
 
  # List of all cuisine categories used in the project.
@@ -545,6 +548,23 @@ def group_taste_profile(answers):
             f"(Cluster {current_label + 1} of {len(set(labels))})"
         )
         st.write(explanation)
+
+        # === Needed for AI implementation: Group Summary (Alex) – START ===
+        ai_input = {
+            "budget_symbol_group": budget_symbol_group,
+            "numeric_budget_group": rounded_budget,
+            "top_cuisine_group": most_preferred_cuisine,
+            "walking_distance_label_group": walk_label,
+            "walking_radius_m_group": int(group_walking_radius),
+            "cluster_name_group": name,
+            "cluster_id_group": int(current_label),
+        }
+
+        ai_summary_text = generate_group_summary(ai_input)
+
+        st.subheader("AI Summary of Your Group")
+        st.info(ai_summary_text)
+        # === Needed for AI implementation: Group Summary (Alex) – END ===
 
          # Save cluster info for the API page
         st.session_state["current_group_cluster_id"] = int(current_label)
