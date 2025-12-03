@@ -17,5 +17,4 @@ matplotlib
 altair
 requests
 scikit-learn
-
-
+openai>=1.6.0
