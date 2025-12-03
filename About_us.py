@@ -56,20 +56,30 @@ def show_about_us():
         },
     ]
 
-    # Layout: 2 columns per row for member cards
+    # Layout: 2 columns per row for the first four member cards (vertical images)
+    vertical_members = members[:4]
+    horizontal_member = members[4]
+
     cols = st.columns(2)
 
-    for i, member in enumerate(members):
+    for i, member in enumerate(vertical_members):
         col = cols[i % 2]   # cycle through column 0 and 1
         with col:
-            # Individual member image (use placeholder if you don’t have them yet)
             st.image(member["image"], width=240)
             st.markdown(f"**{member['name']}**")
             st.write(member["role"])
             st.write(f"[{member['email']}](mailto:{member['email']})")
 
+    # Center the horizontal image below the four vertical ones
+    spacer_left, center_col, spacer_right = st.columns([1, 2, 1])
+    with center_col:
+        st.image(horizontal_member["image"], use_column_width=True)
+        st.markdown(f"**{horizontal_member['name']}**")
+        st.write(horizontal_member["role"])
+        st.write(f"[{horizontal_member['email']}](mailto:{horizontal_member['email']})")
+
 # ---- Timeline section ----
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     render_timeline()
 
 def render_timeline():
@@ -178,3 +188,13 @@ def render_timeline():
         )
 
     st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        We hope FOODMINGLE was able to make your group dinner plans a little easier and more fun.  
+        If you have ideas on how to improve the app or features you would love to see, we’d be happy to hear from you.  
+        Your feedback can help us refine the recommendations, improve the design, and maybe even bring FOODMINGLE to life beyond this course.  
+        Feel free to share what worked well for you and what didn’t quite hit the mark.  
+        Thank you for trying FOODMINGLE and being part of our journey!
+        """
+    )
