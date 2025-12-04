@@ -160,6 +160,7 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
     # Base search parameters: strict filter (Zurich + radius + cuisine + price)
     # Additional: we now use the resolved coordinates of one of the 9 biggest Swiss cities
     # (by population) as the center of the radius search, with Zurich as the default fallback.
+    # Note: The radius parameter (and its slider in the UI) is interpreted as straight-line distance from the selected city center.
     base_params = {
         "latitude": latitude,
         "longitude": longitude,
