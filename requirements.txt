@@ -17,5 +17,4 @@ matplotlib
 altair
 requests
 scikit-learn
-huggingface-hub>=0.23.0
 groq
