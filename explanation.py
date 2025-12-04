@@ -1,25 +1,22 @@
 import streamlit as st
 
-# === Alex: AI integration setup (OpenAI) – START ===
+# === Alex: AI integration setup (HuggingFace, free) – START ===
 try:
-    from openai import OpenAI  # Alex: new OpenAI client (requires openai>=1.0.0)
-    HAVE_OPENAI = True
+    # Alex: use a free, open model hosted on HuggingFace (no API key required for basic use)
+    from huggingface_hub import InferenceClient
+
+    HF_MODEL_ID = "microsoft/phi-3-mini-4k-instruct"
+    hf_client = InferenceClient(HF_MODEL_ID)
+    HAVE_HF = True
 except Exception as e:
-    HAVE_OPENAI = False
-    OPENAI_IMPORT_ERROR = e
-    OpenAI = None  # Alex: placeholder so the name exists even if import fails
-
-# Alex: read API key from Streamlit secrets
-API_KEY = st.secrets.get("OPENAI_API_KEY", None)
-
-client = None
-if HAVE_OPENAI and API_KEY:
-    # Alex: create a reusable OpenAI client instance
-    client = OpenAI(api_key=API_KEY)
-# === Alex: AI integration setup (OpenAI) – END ===
+    HF_MODEL_ID = None
+    hf_client = None
+    HAVE_HF = False
+    HF_ERROR = e  # Alex: stored only for debugging if ever needed
+# === Alex: AI integration setup (HuggingFace, free) – END ===
 
 
-# Alex: simple fallback texts in case OpenAI is not available
+# Alex: simple fallback texts in case the HuggingFace model is not available
 def _fallback_group_summary(taste_profile: dict) -> str:
     cluster = taste_profile.get("cluster_name", "your group")
     cuisine = taste_profile.get("top_cuisine_group", "your favourite cuisines")
@@ -29,7 +26,7 @@ def _fallback_group_summary(taste_profile: dict) -> str:
     return (
         f"Based on your answers, **{cluster}** looks like a group that enjoys {cuisine}, "
         f"is comfortable around a {budget} budget, and prefers about {walk} of walking. "
-        "Once the live AI integration is running, this summary will become even more playful and personalised."
+        "This description is generated without a live AI model, but still reflects your group’s core preferences."
     )
 
 
@@ -38,19 +35,19 @@ def _fallback_restaurant_summary(restaurant: dict) -> str:
     cuisine = restaurant.get("categories", "the chosen cuisine")
     return (
         f"This is one of the restaurants that best fits your group's profile. **{name}** matches your budget, "
-        f"location and taste preferences. Once the live AI integration is active, you’ll see a more playful "
-        f"description here for {name}."
+        f"location and taste preferences. This description is generated without a live AI model, but still summarises "
+        f"why {name} is a reasonable match for your group."
     )
 
 
-# === Alex: AI-generated group summary – START ===
+# === Alex: AI-generated group summary (HuggingFace) – START ===
 def generate_group_summary(taste_profile: dict) -> str:
     """
     Alex: Creates a fun, friendly 2–3 sentence summary of the group's food preferences.
-    Uses OpenAI if available, otherwise falls back to a static but sensible text.
+    Uses a free HuggingFace model if available, otherwise falls back to a static but sensible text.
     """
-    # If OpenAI is not available or no API key or client → use fallback
-    if not HAVE_OPENAI or not API_KEY or client is None:
+    # If the HuggingFace client is not available → use fallback
+    if not HAVE_HF or hf_client is None:
         return _fallback_group_summary(taste_profile)
 
     # Build a compact, human-readable description of the data for the prompt
@@ -77,27 +74,27 @@ Group info:
 """
 
     try:
-        # Alex: use OpenAI chat completions via the new client
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=130,
+        # Alex: generate text using a free HuggingFace model
+        response = hf_client.text_generation(
+            prompt,
+            max_new_tokens=130,
             temperature=0.9,
+            do_sample=True,
         )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        # Alex: never crash the app – show fallback instead
-        return _fallback_group_summary(taste_profile) + f" (AI error: {e})"
-# === Alex: AI-generated group summary – END ===
+        return response.strip()
+    except Exception:
+        # Alex: never crash the app – show fallback instead (no error details for the user)
+        return _fallback_group_summary(taste_profile)
+# === Alex: AI-generated group summary (HuggingFace) – END ===
 
 
-# === Alex: AI-generated restaurant description – START ===
+# === Alex: AI-generated restaurant description (HuggingFace) – START ===
 def generate_restaurant_summary(restaurant: dict) -> str:
     """
     Alex: Produces a playful, witty 2–3 sentence description for a single restaurant.
-    Uses OpenAI when possible, otherwise returns a static but meaningful text.
+    Uses a free HuggingFace model when possible, otherwise returns a static but meaningful text.
     """
-    if not HAVE_OPENAI or not API_KEY or client is None:
+    if not HAVE_HF or hf_client is None:
         return _fallback_restaurant_summary(restaurant)
 
     name = restaurant.get("name", "this place")
@@ -127,13 +124,14 @@ Restaurant data:
 """
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=130,
+        response = hf_client.text_generation(
+            prompt,
+            max_new_tokens=130,
             temperature=0.95,
+            do_sample=True,
         )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        return _fallback_restaurant_summary(restaurant) + f" (AI error: {e})"
-# === Alex: AI-generated restaurant description – END ===
+        return response.strip()
+    except Exception:
+        # Alex: fall back to a clean static description if anything goes wrong
+        return _fallback_restaurant_summary(restaurant)
+# === Alex: AI-generated restaurant description (HuggingFace) – END ===
