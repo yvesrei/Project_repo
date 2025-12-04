@@ -2,10 +2,10 @@ import streamlit as st
 
 # === Alex: AI integration setup (HuggingFace, free) – START ===
 try:
-    # Alex: use a free, open model hosted on HuggingFace (no API key required for basic use)
+    # Alex: use a small, widely available model so it runs reliably on free inference
     from huggingface_hub import InferenceClient
 
-    HF_MODEL_ID = "microsoft/phi-3-mini-4k-instruct"
+    HF_MODEL_ID = "gpt2"
     hf_client = InferenceClient(HF_MODEL_ID)
     HAVE_HF = True
 except Exception as e:
@@ -24,9 +24,10 @@ def _fallback_group_summary(taste_profile: dict) -> str:
     walk = taste_profile.get("walking_distance_label_group", "your usual walking distance")
 
     return (
-        f"Based on your answers, **{cluster}** looks like a group that enjoys {cuisine}, "
-        f"is comfortable around a {budget} budget, and prefers about {walk} of walking. "
-        "This description is generated without a live AI model, but still reflects your group’s core preferences."
+        f"Tonight you're rolling with the **{cluster}** – a group that loves {cuisine} "
+        f"and feels comfortable at a {budget} budget level. "
+        f"With about {walk} in you before dinner, we’ll look for spots that feel close enough to reach "
+        "without complaints but still like a little outing."
     )
 
 
@@ -34,9 +35,9 @@ def _fallback_restaurant_summary(restaurant: dict) -> str:
     name = restaurant.get("name", "this place")
     cuisine = restaurant.get("categories", "the chosen cuisine")
     return (
-        f"This is one of the restaurants that best fits your group's profile. **{name}** matches your budget, "
-        f"location and taste preferences. This description is generated without a live AI model, but still summarises "
-        f"why {name} is a reasonable match for your group."
+        f"**{name}** is one of the restaurants that best fits your group's profile. "
+        f"It lines up with your budget, location and taste for {cuisine}, "
+        "making it a strong pick for tonight’s crew."
     )
 
 
@@ -82,8 +83,9 @@ Group info:
             do_sample=True,
         )
         return response.strip()
-    except Exception:
-        # Alex: never crash the app – show fallback instead (no error details for the user)
+    except Exception as e:
+        # Alex: never crash the app – show fallback instead, but show a small debug hint
+        st.warning(f"HuggingFace group summary error: {e}")
         return _fallback_group_summary(taste_profile)
 # === Alex: AI-generated group summary (HuggingFace) – END ===
 
@@ -131,7 +133,8 @@ Restaurant data:
             do_sample=True,
         )
         return response.strip()
-    except Exception:
-        # Alex: fall back to a clean static description if anything goes wrong
+    except Exception as e:
+        # Alex: fall back to a clean static description if anything goes wrong, with a small debug hint
+        st.warning(f"HuggingFace restaurant summary error: {e}")
         return _fallback_restaurant_summary(restaurant)
 # === Alex: AI-generated restaurant description (HuggingFace) – END ===
