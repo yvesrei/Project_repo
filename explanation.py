@@ -1,19 +1,22 @@
 import streamlit as st
 
-# === Alex: AI integration setup (HuggingFace, free) – START ===
+# === Alex: AI integration setup (Groq) – START ===
 try:
-    # Alex: use a small, widely available model so it runs reliably on free inference
-    from huggingface_hub import InferenceClient
+    from groq import Groq
 
-    HF_MODEL_ID = "gpt2"
-    hf_client = InferenceClient(HF_MODEL_ID)
-    HAVE_HF = True
+    # Alex: read API key from Streamlit secrets. This must be set in Streamlit Cloud.
+    GROQ_API_KEY = st.secrets.get("GROQ_API_KEY")
+    if GROQ_API_KEY:
+        groq_client = Groq(api_key=GROQ_API_KEY)
+        HAVE_GROQ = True
+    else:
+        groq_client = None
+        HAVE_GROQ = False
 except Exception as e:
-    HF_MODEL_ID = None
-    hf_client = None
-    HAVE_HF = False
-    HF_ERROR = e  # Alex: stored only for debugging if ever needed
-# === Alex: AI integration setup (HuggingFace, free) – END ===
+    groq_client = None
+    HAVE_GROQ = False
+    GROQ_INIT_ERROR = e  # Alex: stored only for debugging if ever needed
+# === Alex: AI integration setup (Groq) – END ===
 
 
 # Alex: simple fallback texts in case the HuggingFace model is not available
@@ -41,14 +44,14 @@ def _fallback_restaurant_summary(restaurant: dict) -> str:
     )
 
 
-# === Alex: AI-generated group summary (HuggingFace) – START ===
+# === Alex: AI-generated group summary (Groq) – START ===
 def generate_group_summary(taste_profile: dict) -> str:
     """
     Alex: Creates a fun, friendly 2–3 sentence summary of the group's food preferences.
-    Uses a free HuggingFace model if available, otherwise falls back to a static but sensible text.
+    Uses a Groq-hosted Llama 3 model if available, otherwise falls back to a static but sensible text.
     """
-    # If the HuggingFace client is not available → use fallback
-    if not HAVE_HF or hf_client is None:
+    # If the Groq client is not available → use fallback
+    if not HAVE_GROQ or groq_client is None:
         return _fallback_group_summary(taste_profile)
 
     # Build a compact, human-readable description of the data for the prompt
@@ -75,28 +78,37 @@ Group info:
 """
 
     try:
-        # Alex: generate text using a free HuggingFace model
-        response = hf_client.text_generation(
-            prompt,
-            max_new_tokens=130,
+        # Alex: generate text using Groq (Llama 3)
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a friendly assistant that writes short, playful summaries "
+                        "of a group's restaurant preferences for a dinner-planning app."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=130,
             temperature=0.9,
-            do_sample=True,
         )
-        return response.strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         # Alex: never crash the app – show fallback instead, but show a small debug hint
-        st.warning(f"HuggingFace group summary error: {e}")
+        st.warning(f"Groq group summary error: {e}")
         return _fallback_group_summary(taste_profile)
-# === Alex: AI-generated group summary (HuggingFace) – END ===
+# === Alex: AI-generated group summary (Groq) – END ===
 
 
-# === Alex: AI-generated restaurant description (HuggingFace) – START ===
+# === Alex: AI-generated restaurant description (Groq) – START ===
 def generate_restaurant_summary(restaurant: dict) -> str:
     """
     Alex: Produces a playful, witty 2–3 sentence description for a single restaurant.
-    Uses a free HuggingFace model when possible, otherwise returns a static but meaningful text.
+    Uses a Groq-hosted Llama 3 model when possible, otherwise returns a static but meaningful text.
     """
-    if not HAVE_HF or hf_client is None:
+    if not HAVE_GROQ or groq_client is None:
         return _fallback_restaurant_summary(restaurant)
 
     name = restaurant.get("name", "this place")
@@ -126,15 +138,24 @@ Restaurant data:
 """
 
     try:
-        response = hf_client.text_generation(
-            prompt,
-            max_new_tokens=130,
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a helpful assistant that writes short, fun descriptions of restaurants "
+                        "for a group dinner recommendation app."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=130,
             temperature=0.95,
-            do_sample=True,
         )
-        return response.strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         # Alex: fall back to a clean static description if anything goes wrong, with a small debug hint
-        st.warning(f"HuggingFace restaurant summary error: {e}")
+        st.warning(f"Groq restaurant summary error: {e}")
         return _fallback_restaurant_summary(restaurant)
-# === Alex: AI-generated restaurant description (HuggingFace) – END ===
+# === Alex: AI-generated restaurant description (Groq) – END ===
