@@ -166,10 +166,12 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         "longitude": longitude,
         "radius": radius,
         # "open_at": open_at,          # time-based filter (added conditionally below)
-        "categories": cuisine.lower(),
+        "categories": ",".join(CUISINE_MAPPING[cuisine]),
         "price": str(int(budget_level)),
         "limit": 50,
     }
+
+
     if open_at is not None:
         # First, try to respect the meal time. If that leads to no results, we will
         # later rerun the same search logic without this key.
@@ -329,4 +331,3 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
     # Return the list with up to 5 processed restaurant entries
     return results
 
-    
