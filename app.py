@@ -62,13 +62,19 @@ def show_api_results():
     )
 
     # Let the user choose the maximum walking distance (radius for Yelp in meters)
+    # Default value of slider is the group walking distance value
+
+    default_radius = st.session_state.get("group_walking_radius", 2500)
     radius = st.slider(
         "Maximum walking distance (in meters)",
-        min_value=500,
+        min_value=100,
         max_value=5000,
-        value=2500,
+        value=int(default_radius),
         step=250,
     )
+
+
+
 
     # Page title for the restaurant results view
     st.title(f"Matching Restaurants in {city} for {meal_choice}!")
