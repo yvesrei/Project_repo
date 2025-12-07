@@ -7,12 +7,12 @@ import time
 st.title(" Resetting Session...")
 
 st.info(
-    "You clicked Home, which will start a new FoodMingle session"
+    "You clicked on Home, which will start a new FoodMingle session \n\n"
     "All previous answers and results will be cleared."
 )
 
 # Small pause so user notices the info
-time.sleep(3)
+time.sleep(5)
 
 # Immediately reset all session state
 st.session_state.clear()
