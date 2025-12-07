@@ -4,6 +4,8 @@
 import streamlit as st
 import time
 
+# Implemented a short explanation to inform the user that they clicked onto the homepage,
+# which will reset the whole session and that they will get redirected to the home page.
 st.title(" Resetting Session...")
 
 st.info(
@@ -11,14 +13,15 @@ st.info(
     "All previous answers and results will be cleared."
 )
 
-# Small pause so user notices the info
+# Implemented a 5 second pause so that the user is able to read the information.
 time.sleep(5)
 
-# Immediately reset all session state
+# Immediately reset all session state = clear all answers.
 st.session_state.clear()
 
-# Set page=home for your app router
+# Sets the session back to home.
 st.session_state["page"] = "home"
 
-# Redirect to main app immediately
+# Redirect to main app immediately, so the user uses the main file and we
+# can prevent the user from filling in information into two different pages.
 st.switch_page("app.py")
