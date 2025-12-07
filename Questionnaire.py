@@ -138,7 +138,7 @@ def show_questionnaire():
         )
     
         
-        st.markdown("Rank the three attributes using 1, 2, and 3 (3 = most important). Use each number once.")
+        st.markdown("Set a weight (1–3) for each attribute (3 = most important, 1 = least important. Use each number once.")
 
 
         ## The importance ranking system
