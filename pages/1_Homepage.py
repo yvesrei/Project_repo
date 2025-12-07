@@ -2,6 +2,17 @@
 # Streamlit loads it automatically as an independent page
 
 import streamlit as st
+import time
+
+st.title(" Resetting Session...")
+
+st.info(
+    "You clicked Home, which will start a new FoodMingle session"
+    "All previous answers and results will be cleared."
+)
+
+# Small pause so user notices the info
+time.sleep(3)
 
 # Immediately reset all session state
 st.session_state.clear()
