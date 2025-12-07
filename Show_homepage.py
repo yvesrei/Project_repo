@@ -44,10 +44,6 @@ def show_homepage():
         else:
                 st.session_state["page"] = "questionnaire"
                 st.rerun()
-        ## Visual line to seperat the two buttons
-    st.write("---")    
+         
 
-        ## If the user clicks this button, the st.session_state is set to the page "about" --> page about is displayed
-    if st.button("About us", key="about_button"): 
-        st.session_state["page"] = "about"
-        st.rerun()
+
