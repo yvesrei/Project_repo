@@ -17,8 +17,8 @@ st.info(
     "All previous answers and results will be cleared."
 )
 
-# Implemented a 5 second pause so that the user is able to read the information.
-time.sleep(5)
+# Implemented a 3 second pause so that the user is able to read the information.
+time.sleep(3)
 
 # Immediately reset all session state = clear all answers.
 st.session_state.clear()
