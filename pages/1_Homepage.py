@@ -1,5 +1,9 @@
 # This file is stored in the pages directory
-# Streamlit loads it automatically as an independent page
+# Streamlit loads it automatically as an independent pagr
+# Clicking "Home" in the Streamlit sidebar opens this page.
+# Its only purpose is to reset the current FoodMingle session and
+# redirect the user back to the main homepage in app.py.
+
 
 import streamlit as st
 import time
@@ -22,6 +26,6 @@ st.session_state.clear()
 # Sets the session back to home.
 st.session_state["page"] = "home"
 
-# Redirect to main app immediately, so the user uses the main file and we
-# can prevent the user from filling in information into two different pages.
+# Redirect the user back to the main application.
+# This ensures that all interactions happen inside the central app flow.
 st.switch_page("app.py")
