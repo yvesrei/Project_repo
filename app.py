@@ -85,6 +85,7 @@ def show_api_results():
         budget_level=st.session_state["group_budget_numeric"],
         cuisine=st.session_state["group_cuisine"],
         open_at=open_at_timestamp,  # Time constraint is now “soft” – api_client will drop it if it kills all results
+        
     )
 
     # Handle the case where no restaurants are returned
