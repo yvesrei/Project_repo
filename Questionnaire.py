@@ -73,7 +73,7 @@ def show_questionnaire():
          # This function maps frontend long labels from the multiselect button back to the original internal category keys.
          # Therefore we keep the naming simple and clean.
         CUISINE_LABEL_MAP = {
-              "Italian": "Italian",
+            "Italian": "Italian",
             "Asian (Thai, Chinese, Japanese, Korean)": "Asian",
             "Swiss / Alpine (Swiss, Austrian, German)": "Swiss / Alpine",
             "Mediterranean (Greek, Spanish, Turkish, Portuguese)": "Mediterranean",
