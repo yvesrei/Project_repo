@@ -72,7 +72,6 @@ Do NOT repeat the raw numbers; describe them in words.
 
 Group info:
 - Cluster name: {cluster_name}
-# - Cluster id: {cluster_id}
 - Budget (average): {budget} → symbol {budget_symbol}
 - Top cuisine: {cuisine}
 - Preferred walking distance label: {walk}
