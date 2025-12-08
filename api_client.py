@@ -245,11 +245,11 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         ]
         address = ", ".join([part for part in address_parts if part])
 
-        # --- Opening hours block ---
-        # Yelp returns hours as a list of "open" entries
-        # We convert that structure into a human-readable multi-line string,
-        # like:
-        #   Mon: 11:00–22:00
+         # --- Opening hours block ---
+         # Yelp returns hours as a list of "open" entries
+         # We convert that structure into a human-readable multi-line string,
+         # like:
+         #   Mon: 11:00–22:00
         opening_hours = None
         hours_list = detail.get("hours")
         if hours_list:
