@@ -56,7 +56,8 @@ def generate_group_summary(taste_profile: dict) -> str:
 
     # Build a compact, human-readable description of the data for the prompt
     cluster_name = taste_profile.get("cluster_name", "this group")
-    cluster_id = taste_profile.get("cluster_id")
+     # cluster_id = taste_profile.get("cluster_id") # We noticed that it doesn't need the cluster id because 
+     # it already gets the cluster name. 
     budget = taste_profile.get("numeric_budget_group")
     budget_symbol = taste_profile.get("budget_symbol_group", "$$")
     cuisine = taste_profile.get("top_cuisine_group", "mixed cuisines")
@@ -71,7 +72,7 @@ Do NOT repeat the raw numbers; describe them in words.
 
 Group info:
 - Cluster name: {cluster_name}
-- Cluster id: {cluster_id}
+# - Cluster id: {cluster_id}
 - Budget (average): {budget} → symbol {budget_symbol}
 - Top cuisine: {cuisine}
 - Preferred walking distance label: {walk}
