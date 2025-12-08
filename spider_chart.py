@@ -27,7 +27,7 @@ CUISINES = [
     "Seafood & Sushi"
 ]
 
- ## Taste-Matrix for the ML clustering
+ ## Taste-Matrix for the ML clustering.
  # We transform each cuisine into 5 underlying taste dimensions:
  # 1) spice: how spicy the cuisine usually is
  # 2) hearty: how heavy/comfort-oriented the cuisine is
