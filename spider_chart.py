@@ -27,19 +27,19 @@ CUISINES = [
     "Seafood & Sushi"
 ]
 
-# # Taste-Matrix for the ML clustering
-# We transform each cuisine into 5 underlying taste dimensions:
-# 1) spice: how spicy the cuisine usually is
-# 2) hearty: how heavy/comfort-oriented the cuisine is
-# 3) healthy: how light/fresh/healthy the cuisine tends to be
-# 4) exotic: how adventurous/unusual/unique the flavours are
-# 5) light: how light/easy-to-digest the cuisine is
+ ## Taste-Matrix for the ML clustering
+ # We transform each cuisine into 5 underlying taste dimensions:
+ # 1) spice: how spicy the cuisine usually is
+ # 2) hearty: how heavy/comfort-oriented the cuisine is
+ # 3) healthy: how light/fresh/healthy the cuisine tends to be
+ # 4) exotic: how adventurous/unusual/unique the flavours are
+ # 5) light: how light/easy-to-digest the cuisine is
 
-# This matrix allows us to convert cuisine choices into a numerical
-# taste profile which makes the machine learning possible.
+ # This matrix allows us to convert cuisine choices into a numerical
+ # taste profile which makes the machine learning possible.
 
-# Iimportant:
-# It is only used internally to build the ML feature vectors.
+ # Iimportant:
+ # It is only used internally to build the ML feature vectors.
 
 TASTE_MATRIX = {
     "Italian":              [1, 4, 2, 1, 3],
@@ -60,28 +60,40 @@ DEFAULT_TASTE = [2, 3, 3, 3, 3]
  ## Convert each participants cuisine ranking into a 5D taste vector
  # We combine the 3 ranked cuisines (rank1 → weight 3, rank2 → weight 2, rank3 → weight 1)
  # into a weighted average taste profile for each participant
- # Result shape: [spice, hearty, healthy, exotic, light] = 5 dimensions
+ # Result of the shape: (spice, hearty, healthy, exotic, light) = 5 dimensions
 
 def build_participant_taste_vector(p):
-    ranked = p.get("ranked_cuisines", [])
 
+     # Extract the ranked cuisines from this participants answers.
+     # If the key does not exist, we use an empty list.
+    ranked = p.get("ranked_cuisines", [])
+    
+     # If the participant has no ranked cuisines, 
+     # return a neutral/default taste profile that was created before. 
     if not ranked:
         return np.array(DEFAULT_TASTE, dtype=float)
 
-    weights = [3, 2, 1]   # rank weights
+     # Ranking weights for rank positions
+    weights = [3, 2, 1]  
+     # Initialize a 5D vector of zeros to start accumulating the weighted taste values.
     taste_sum = np.zeros(5, dtype=float)
+     # Stores the total weight applied, its always 6 for 3 cuisines.
     total_w = 0.0
-
+   
+     # Enumerate gets the index and cuisine from the ranked list.
+     # We then loop through it get the correct weight for this rank and add that to the total weight,
+     # and then add the cuisines taste vector multiplied by its weight to the taste sum.
     for i, cuisine in enumerate(ranked):
         if i >= 3:
             break
         w = weights[i]
         taste_sum += w * np.array(TASTE_MATRIX.get(cuisine, DEFAULT_TASTE))
         total_w += w
-
+     
+     # Divide by the total weight to produce the weighted average taste vector per participant.
     return taste_sum / total_w
 
- # Saves the ML vetors in the csv file
+ # These lines define settings and the file path used later for CSV writing.
 EXPECTED_DIM = 6 # Budget + 5 taste values
 BUDGET_DICT = {"$": 1, "$$": 2, "$$$": 3, "$$$$": 4}
 REVERSE_BUDGET_DICT = {v: k for k, v in BUDGET_DICT.items()}
@@ -192,7 +204,7 @@ def register_group_profile(feature_vector):
 
  ## Clustering on the vectors
  # This function loads all stored taste profiles (past groups) and
- # adds synthetic profiles if needed, and finally runs K-Means clustering.
+ # adds synthetic profiles if needed, and runs K-Means clustering.
  # It returns:
  # - all cluster labels
  # - the 4 cluster centers
@@ -538,7 +550,7 @@ def group_taste_profile(answers):
     else:
          # Select the cluster center of today’s group
         center = centers[current_label]
-         # Convert numeric cluster center → personality name
+         # Convert numeric cluster center -> personality name
         name, explanation, details = describe_cluster_center(center)
     
          # Display the final “taste personality”
