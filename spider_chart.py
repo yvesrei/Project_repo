@@ -38,7 +38,7 @@ CUISINES = [
  # This matrix allows us to convert cuisine choices into a numerical
  # taste profile which makes the machine learning possible.
 
- # Iimportant:
+ # Important:
  # It is only used internally to build the ML feature vectors.
 
 TASTE_MATRIX = {
