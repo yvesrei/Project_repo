@@ -3,7 +3,8 @@ import requests
 
 API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApBVkLwVfkNqR0v6X9K8DcuyqZBycjrPixxx9-DQen0SeR0Qp2yjaTD4UlaXYx"
 
-#Cuisine mapping system
+# Cuisine mapping system within a dictionary, which assigns different Yelp 
+# categories via catchphrases to our simplified cuisine types.
 CUISINE_MAPPING = {
     "Italian": ["italian", "pizza", "pasta", "trattoria", "brasserie", "bistro"],
     "Asian": ["asian", "thai", "chinese", "szechuan", "cantonese", "japanese",

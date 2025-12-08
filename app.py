@@ -96,10 +96,10 @@ def show_api_results():
     # Display each restaurant's key information to the user, including name, rarting, address, phone, 
     # website, opening hours, and menu URL
     for r in results:
-        st.subheader(r["name"])
+        st.subheader(f"{r['name']} {r['rating_emoji']}")
 
         if r["rating"] is not None:
-            st.write(f"⭐ {r['rating']} / 5")
+            st.write(f"{r['rating_emoji']} {r['rating']} / 5")
 
         if r["address"]:
             st.write(r["address"])
@@ -117,13 +117,12 @@ def show_api_results():
         if r["menu_url"]:
             st.markdown(f"[Menu]({r['menu_url']})")
 
-        # === Needed for AI implementation: Restaurant Description (Alex) – START ===
+        # Needed for AI implementation: Restaurant Description (Alex) – START
         ai_text = generate_restaurant_summary(r)
         st.info(ai_text)
-        # === Needed for AI implementation: Restaurant Description (Alex) – END ===
+        # Needed for AI implementation: Restaurant Description (Alex) – END
 
         st.markdown("---")
-
 
 ## 1. Session state initialization
 # Streamlit reruns the script on every interaction. We use st.session_state
