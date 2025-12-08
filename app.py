@@ -1,7 +1,9 @@
 # This is the main Streamlit app file
 #  Defines the navigation system (home, questionnaire, result, API, about)
 #  Manages session state (participants, answers, current page)
-#  Connects the UI to the external restaurant API
+
+
+
 
 
 import streamlit as st
