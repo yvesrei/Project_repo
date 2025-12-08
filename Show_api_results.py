@@ -104,7 +104,8 @@ def show_api_results():
             st.write("🕒 Opening hours:")
             st.text(r["opening_hours"])  # preserves line breaks
 
-        if r["menu_url"]:
+        if r.get("menu_url"):
+
             st.markdown(f"[Menu]({r['menu_url']})")
 
         # Needed for AI implementation: Restaurant Description (Alex) – START
