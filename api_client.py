@@ -6,7 +6,7 @@ API_KEY = "DWAyru0_dEUX8E3nQ679ka2iv8cj24u3Pl4ZCpcU_O1ciClu-HziLNSmqMItE5P22aApB
 # Cuisine mapping system within a dictionary, which assigns different Yelp 
 # categories via catchphrases to our simplified cuisine types.
 CUISINE_MAPPING = {
-    "Italian": ["italian", "pizza", "pasta", "trattoria", "brasserie", "bistro"],
+   "Italian": ["italian", "pizza", "pasta", "trattoria", "osteria", "bistro"],
     "Asian": ["asian", "thai", "chinese", "szechuan", "cantonese", "japanese",
               "sushi", "ramen", "korean", "vietnamese", "nepalese", "himalayan",
               "asianfusion"],
@@ -32,54 +32,41 @@ def map_yelp_category(yelp_categories):
             if d in yelp_categories:
                 return simple
     return "International"
-# Coordinates for Zurich (BY NOW we ONLY search around this location)
+
+# Coordinates for Zurich (Initially, we used to ONLY search around this location)
 ZURICH_LAT = 47.3769
 ZURICH_LON = 8.5417
 
 # We now  support the 9 biggest Swiss cities (by population) as search centers,
 # using their main train station or an equivalent central point as the reference
-# for the radius feature. Multiple common spellings are mapped to the same coords.
+# for the radius feature.
 CITY_COORDS = {
     # Zurich
-    "zurich": (ZURICH_LAT, ZURICH_LON),
-    "zürich": (ZURICH_LAT, ZURICH_LON),
-    "zuerich": (ZURICH_LAT, ZURICH_LON),
-    "zurich hb": (ZURICH_LAT, ZURICH_LON),
+    "Zurich": (ZURICH_LAT, ZURICH_LON),
 
     # Basel
-    "basel": (47.5474, 7.5890),
-    "bâle": (47.5474, 7.5890),
-    "basel sbb": (47.5474, 7.5890),
+    "Basel": (47.5474, 7.5890),
 
     # Geneva
-    "geneva": (46.2102, 6.1424),
-    "genève": (46.2102, 6.1424),
-    "genf": (46.2102, 6.1424),
+    "Geneva": (46.2102, 6.1424),
 
     # Lausanne
-    "lausanne": (46.5160, 6.6291),
-    "lausane": (46.5160, 6.6291),
+    "Lausanne": (46.5160, 6.6291),
 
     # Winterthur
-    "winterthur": (47.4998, 8.7243),
-    "winterthur hb": (47.4998, 8.7243),
+    "Winterthur": (47.4998, 8.7243),
 
-    # St. Gallen (with various spellings)
-    "st. gallen": (47.4232, 9.3697),
-    "st gallen": (47.4232, 9.3697),
-    "sankt gallen": (47.4232, 9.3697),
-    "saint gallen": (47.4232, 9.3697),
+    # St. Gallen)
+    "St. Gallen": (47.4232, 9.3697),
 
     # Lugano
-    "lugano": (46.0061, 8.9463),
+    "Lugano": (46.0061, 8.9463),
 
     # Bern
-    "bern": (46.9488, 7.4391),
-    "berne": (46.9488, 7.4391),
+    "Bern": (46.9488, 7.4391),
 
     # Luzern
-    "luzern": (47.0502, 8.3102),
-    "lucerne": (47.0502, 8.3102),
+    "Luzern": (47.0502, 8.3102),
 }
 
 # Base URLs for Yelp
@@ -114,13 +101,10 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
     - phone
     - website
     - opening_hours (multi-line string)
-    - menu_url (if available)
 
     Additional:
-    We now support searches centered around the 9 largest Swiss cities, using their
-    main train stations or central points as reference for the radius search, because
-    these cities are the most relevant across Switzerland. Each result also includes
-    an emoji representation of the rating and image URLs retrieved from Yelp.
+    We now support searches centered around the 9 largest Swiss cities, with 
+    each result also including an emoji representation of the rating from Yelp.
     """
 
     if not API_KEY:
@@ -133,7 +117,7 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
     }
 
     # Resolve the chosen city (with many spelling variants) to coordinates.
-    city_key = (city or "zurich").strip().lower()
+    city_key = (city or "Zurich").strip()
     latitude, longitude = CITY_COORDS.get(city_key, (ZURICH_LAT, ZURICH_LON))
 
     # Helper function to execute a Yelp search request and return the "businesses" list
@@ -148,10 +132,9 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
             return []
         businesses = data.get("businesses", [])
 
-        # EXCLUDE restaurants with rating below 3.5 and with fewer than 0 reviews.
         # We only keep businesses where rating >= 3.5 AND review_count >= 0.
         # This ensures we only show reasonably rated places. However, we had to loosen up the
-        # filter conditions as most restaurants have few review on Yelp.
+        # filter conditions as most restaurants have few reviews on Yelp.
         businesses = [
             b for b in businesses
             if (b.get("rating") or 0) >= 3.5 and (b.get("review_count") or 0) >= 0
@@ -159,9 +142,9 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         return businesses
 
     # Base search parameters: strict filter (Zurich + radius + cuisine + price)
-    # Additional: we now use the resolved coordinates of one of the 9 biggest Swiss cities
-    # (by population) as the center of the radius search, with Zurich as the default fallback.
-    # Note: The radius parameter (and its slider in the UI) is interpreted as straight-line distance from the selected city center.
+    # Additional: we now use Zurich as the default fallback.
+    # Note: The radius parameter (and its slider in the UI) is interpreted as 
+    # straight-line distance from the selected city center.
     base_params = {
         "latitude": latitude,
         "longitude": longitude,
@@ -209,14 +192,13 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
     businesses = run_search_chain(include_time=True)
 
     # 2) If still no businesses and we had open_at, rerun WITHOUT time constraint.
-    #    This is where we “loosen” opening times while keeping rating and cuisine strict.
+    # This is where we “loosen” opening times while keeping rating and cuisine strict.
     if not businesses and open_at is not None:
         businesses = run_search_chain(include_time=False)
 
     # We only want to show up to 5 restaurants in the UI (user interface), even if Yelp returns more.
     businesses = businesses[:5]
 
-    # This list will hold the normalized restaurant dictionaries that the app uses.
     results = []
 
     # Yelp encodes weekdays as integers (0 = Monday, ..., 6 = Sunday).
@@ -263,28 +245,24 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
         ]
         address = ", ".join([part for part in address_parts if part])
 
-        # Primary image and additional photos pulled from Yelp.
-        primary_image_url = detail.get("image_url") or b.get("image_url")
-        photos = detail.get("photos") or []
-
         # --- Opening hours block ---
-        # Yelp returns hours as a list of "open" entries with:
-        # - day (0–6)
-        # - start/end times as "HHMM" strings (e.g. "1100" for 11:00)
+        # Yelp returns hours as a list of "open" entries
         # We convert that structure into a human-readable multi-line string,
         # like:
         #   Mon: 11:00–22:00
-        #   Tue: 11:00–22:00
         opening_hours = None
         hours_list = detail.get("hours")
         if hours_list:
-            # Use the first hours object (index 0) as Yelp usually puts main hours there.
             open_entries = hours_list[0].get("open", [])
-            lines = []
+
+            # We now group all intervals per day so that each day is shown on a single line.
+            # The current weekday (based on the server time) is underlined to highlight "today".
+            day_intervals = {i: [] for i in range(7)}
 
             for entry in open_entries:
                 # Map numeric day to label; fall back to raw number as string if unknown.
-                day = day_map.get(entry.get("day"), str(entry.get("day")))
+                day_index = entry.get("day")
+                day = day_map.get(day_index, str(day_index))
                 start = entry.get("start", "")
                 end = entry.get("end", "")
 
@@ -294,28 +272,36 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
                 if len(end) == 4:
                     end = f"{end[:2]}:{end[2:]}"
 
+                # Collect each interval string under its day index so we can merge multiple intervals.
+                if day_index in day_intervals:
+                    day_intervals[day_index].append(f"{start}–{end}")
+
+            # Determine today's weekday (0 = Monday, ..., 6 = Sunday)
+            today_index = datetime.today().weekday()
+
+            lines = []
+            for day_index, intervals in day_intervals.items():
+                if not intervals:
+                    # Skip days without opening intervals
+                    continue
+
+                day_label = day_map.get(day_index, str(day_index))
+                interval_str = ", ".join(intervals)
+
                 # Build one line per opening interval
-                lines.append(f"{day}: {start}–{end}")
+                line = f"{day_label}: {interval_str}"
+
+                # Underline the current day to make it visually stand out on the website.
+                if day_index == today_index:
+                    line = f"**{line}** (today)"
+
+                lines.append(line)
 
             # Join all lines into a single multi-line string if we collected any
             if lines:
                 opening_hours = "\n".join(lines)
 
-        # --- Menu URL block ---
-        # Menu information, if available, is typically stored under "attributes".
-        # We check multiple possible keys because Yelp may use different fields.
-        attributes = detail.get("attributes", {}) or {}
-        menu_url = (
-            attributes.get("menu_url")
-            or attributes.get("menu_url_external")
-            or None
-        )
-
         # Build the final normalized restaurant record that the Streamlit UI expects.
-        # This keeps all downstream display logic simple and consistent.
-        # Additional fields:
-        # - rating_emoji: quick emoji representation of the rating (for UI).
-        # - image_url / photos: image URLs from Yelp to display pictures of the restaurant.
         results.append({
             "name": name,
             "rating": rating,
@@ -324,11 +310,6 @@ def api_access(city, radius, budget_level, cuisine, open_at=None):
             "phone": phone,
             "website": url,
             "opening_hours": opening_hours,
-            "menu_url": menu_url,
-            "image_url": primary_image_url,
-            "photos": photos,
         })
 
-    # Return the list with up to 5 processed restaurant entries
     return results
-
