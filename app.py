@@ -124,9 +124,9 @@ def show_api_results():
         st.markdown("---")
 
 
-# --- 1. Session state initialization ---
+## 1. Session state initialization
 # Streamlit reruns the script on every interaction. We use st.session_state
-# to persist values across reruns so we know:
+# to track values across reruns so we know:
 # - which page the user is on,
 # - how many participants there are,
 # - which participant is currently answering the questionnaire,
@@ -144,7 +144,7 @@ if "num_of_participants" not in st.session_state:
     # Initially unknown, so set it to None until the user enters it.
     st.session_state["num_of_participants"] = None
 else:
-    # Once set on the home page, this value is reused across pages.
+    # Once set on the home page, this value is reused across the later pages.
     pass
 
 if "current_participant" not in st.session_state:
@@ -164,12 +164,14 @@ else:
     pass
 
 
-# --- 2. Page navigation (router) ---
+## 2. Page navigation (router)
 # The "page" key in session_state acts as a simple router.
 # Depending on its value, we call exactly one view function.
 # Other parts of the app (buttons, etc.) update st.session_state["page"]
 # to switch between screens.
 
+ # Gets the page at which the app is at the moment.
+ # If "page" exists it returns its value, if not it returns "home".
 page = st.session_state.get("page", "home")
 
 if page == "home":

@@ -70,7 +70,7 @@ def show_questionnaire():
             key=f"type_of_cuisine_{participant}"
             )
 
-         # THis function maps frontend long labels from the multiselect button back to the original internal category keys.
+         # This function maps frontend long labels from the multiselect button back to the original internal category keys.
          # Therefore we keep the naming simple and clean.
         CUISINE_LABEL_MAP = {
               "Italian": "Italian",
