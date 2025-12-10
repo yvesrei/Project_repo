@@ -94,7 +94,7 @@ def rating_to_emoji(rating):
 # Main function used by the Streamlit app to get restaurant matches
 def api_access(city, radius, budget_level, cuisine, open_at=None):
     """
-    Returns up to 5 restaurants in Zurich that match budget + cuisine.
+    Returns up to 5 restaurants that match budget + cuisine.
     For each restaurant it returns:
     - name
     - address

@@ -4,8 +4,6 @@
 
 
 import streamlit as st
-from statistics import mode
-from datetime import datetime, time  
 from Show_homepage import show_homepage
 from Questionnaire import show_questionnaire
 from spider_chart import group_taste_profile
@@ -32,7 +30,6 @@ if "num_of_participants" not in st.session_state:
     # Initially unknown, so set it to None until the user enters it.
     st.session_state["num_of_participants"] = None
 else:
-    # Once set on the home page, this value is reused across the later pages.
     pass
 
 if "current_participant" not in st.session_state:
@@ -40,7 +37,6 @@ if "current_participant" not in st.session_state:
     # We start counting at 1 for the first participant.
     st.session_state["current_participant"] = 1
 else:
-    # This counter is typically incremented when one participant finishes.
     pass
 
 if "answers" not in st.session_state:
@@ -48,7 +44,6 @@ if "answers" not in st.session_state:
     # Each element should contain that participant's responses.
     st.session_state["answers"] = []
 else:
-    # On reruns, we keep all previously collected answers intact.
     pass
 
 
