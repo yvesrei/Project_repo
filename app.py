@@ -3,9 +3,6 @@
 #  Manages session state (participants, answers, current page)
 
 
-
-
-
 import streamlit as st
 from statistics import mode
 from datetime import datetime, time  
