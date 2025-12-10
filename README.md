@@ -10,7 +10,7 @@ Project_repo/
 │
 ├── Show_homepage.py           # Homepage UI logic (select #participants)
 ├── Questionnaire.py           # Questionnaire input page
-├── spider_chart.py            # Aggregation, radar charts, clustering, AI summary
+├── spider_chart.py            # Aggregation, radar charts, clustering (ML), AI summary
 ├── Show_api_results.py        # Restaurant result page (API scoring + display)
 │
 ├── explanation.py             # AI helper functions (group summary)
