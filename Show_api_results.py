@@ -2,9 +2,9 @@ import streamlit as st
 from datetime import datetime, time
 
 
-# Needed for AI implementation: Restaurant descriptions (Alex)
+# Needed for AI implementation: Restaurant descriptions
 from api_client import api_access
-# Needed for AI implementation: Restaurant descriptions (Alex)
+# Needed for AI implementation: Restaurant descriptions
 from explanation import generate_restaurant_summary
 
 
@@ -108,9 +108,9 @@ def show_api_results():
 
             st.markdown(f"[Menu]({r['menu_url']})")
 
-        # Needed for AI implementation: Restaurant Description (Alex) – START
+        # AI implementation: Restaurant Description
         ai_text = generate_restaurant_summary(r)
         st.info(ai_text)
-        # Needed for AI implementation: Restaurant Description (Alex) – END
+        # Creates Box for AI text
 
         st.markdown("---")

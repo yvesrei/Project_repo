@@ -1,10 +1,10 @@
 import streamlit as st
 
-# === Alex: AI integration setup (Groq) – START ===
+# AI integration setup through Groq
 try:
     from groq import Groq
 
-    # Alex: read API key from Streamlit secrets. This must be set in Streamlit Cloud.
+    # Reads API key from Streamlit secrets. This must be set in Streamlit Cloud.
     GROQ_API_KEY = st.secrets.get("GROQ_API_KEY")
     if GROQ_API_KEY:
         groq_client = Groq(api_key=GROQ_API_KEY)
@@ -15,11 +15,11 @@ try:
 except Exception as e:
     groq_client = None
     HAVE_GROQ = False
-    GROQ_INIT_ERROR = e  # Alex: stored only for debugging if ever needed
-# === Alex: AI integration setup (Groq) – END ===
+    GROQ_INIT_ERROR = e  # stored only for debugging if ever needed
 
 
-# Alex: simple fallback texts in case the HuggingFace model is not available
+
+# Simple fallback texts in case the Generation is misfunctioning or the Groq client is not available.
 def _fallback_group_summary(taste_profile: dict) -> str:
     cluster = taste_profile.get("cluster_name", "your group")
     cuisine = taste_profile.get("top_cuisine_group", "your favourite cuisines")
@@ -44,13 +44,13 @@ def _fallback_restaurant_summary(restaurant: dict) -> str:
     )
 
 
-# === Alex: AI-generated group summary (Groq) – START ===
+# AI-generated group summary
 def generate_group_summary(taste_profile: dict) -> str:
     """
     Alex: Creates a fun, friendly 2–3 sentence summary of the group's food preferences.
     Uses a Groq-hosted Llama 3 model if available, otherwise falls back to a static but sensible text.
     """
-    # If the Groq client is not available → use fallback
+    # If the Groq client is not available (so prompt does not work) → use fallback
     if not HAVE_GROQ or groq_client is None:
         return _fallback_group_summary(taste_profile)
 
@@ -78,7 +78,7 @@ Group info:
 """
 
     try:
-        # Alex: generate text using Groq (Llama 3)
+        # generate text using Groq (Llama 3)
         response = groq_client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
@@ -96,13 +96,13 @@ Group info:
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
-        # Alex: never crash the app – show fallback instead, but show a small debug hint
+        # never crash the app – show fallback instead, but show a small debug hint
         st.warning(f"Groq group summary error: {e}")
         return _fallback_group_summary(taste_profile)
-# === Alex: AI-generated group summary (Groq) – END ===
 
 
-# === Alex: AI-generated restaurant description (Groq) – START ===
+
+# AI-generated restaurant description
 def generate_restaurant_summary(restaurant: dict) -> str:
     """
     Alex: Produces a playful, witty 2–3 sentence description for a single restaurant.
@@ -155,7 +155,6 @@ Restaurant data:
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
-        # Alex: fall back to a clean static description if anything goes wrong, with a small debug hint
+        # fall back to a clean static description if anything goes wrong, with a small debug hint
         st.warning(f"Groq restaurant summary error: {e}")
         return _fallback_restaurant_summary(restaurant)
-# === Alex: AI-generated restaurant description (Groq) – END ===
