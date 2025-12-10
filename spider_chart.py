@@ -561,8 +561,8 @@ def group_taste_profile(answers):
         )
         st.write(explanation)
 
-        # === Needed for AI implementation: Group Summary (Alex) – START ===
-        # Alex: build a compact dict with the most important group attributes
+        # AI implementation: Group Summary
+        # Gives all the necessary Info to the AI helper function and writes text based on this
         try:
             ai_input = {
                 "cluster_name": name,
@@ -574,15 +574,15 @@ def group_taste_profile(answers):
                 "walking_radius_m_group": int(group_walking_radius),
             }
 
-            # Alex: call the AI helper to generate a short, fun summary text
+            # Call the AI helper to generate a short, fun summary text
             ai_summary_text = generate_group_summary(ai_input)
 
-            st.subheader("AI Summary of Your Group")  # Alex: AI result headline
+            st.subheader("AI Summary of Your Group")  # AI result headline
             st.info(ai_summary_text)                  # Alex: show AI text in a highlighted box
         except Exception as e:
-            # Alex: fallback so the app never crashes because of AI issues
+            # Fallback so the app never crashes because of AI issues
             st.caption(f"(AI group summary could not be generated: {e})")
-        # === Needed for AI implementation: Group Summary (Alex) – END ===
+
 
          # Save cluster info for the API page
         st.session_state["current_group_cluster_id"] = int(current_label)
