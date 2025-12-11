@@ -126,11 +126,6 @@ elif page == "about":
     # About screen:
     # - General information about the app, authors and context
 
-    # Back navigation: go back to the main landing page.
-    if st.button("← Back to home"):
-        st.session_state["page"] = "home"
-        st.rerun()
-
     show_about_us()
 
 else:
