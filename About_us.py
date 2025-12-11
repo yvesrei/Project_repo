@@ -92,4 +92,4 @@ def show_about_us():
         *Made with late-night coding sessions, laughter, and way too many food debates.*
         """
     )
-# TODO: Alex – remember to update your own picture (Images/alexander.jpg).
+    
