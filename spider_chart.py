@@ -185,6 +185,7 @@ def register_group_profile(feature_vector):
      ## Saves profiles in st.session_state
      # This keeps the current session's history available
      # but only as long as the app is open
+     # Tolist converts the numpy array to a simple pyhton list -> needed for st.session_state
     if "group_profile_vectors" not in st.session_state:
         st.session_state["group_profile_vectors"] = []
     st.session_state["group_profile_vectors"].append(feature_vector.tolist())
@@ -540,7 +541,7 @@ def group_taste_profile(answers):
 
     st.subheader("Group Taste Profile (Machine Learning)")
      
-     # Save it for future ML training (CSV + session)
+     # Perform the clustering using all saved profiles (real + synthetic)
 
     labels, centers, current_label = cluster_group_profiles()
 
