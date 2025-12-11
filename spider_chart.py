@@ -103,7 +103,7 @@ DATA_FILE = Path("group_profiles.csv")
 
 
 
- ## ML group feature vector
+ ## Define ML group feature vector function
  # We combine:
  # - average group budget (numeric)
  # - average taste values
