@@ -1,5 +1,5 @@
 # This file is stored in the pages directory
-# Streamlit loads it automatically as an independent pagr
+# Streamlit loads it automatically as an independent page
 # Clicking "Home" in the Streamlit sidebar opens this page.
 # Its only purpose is to reset the current FoodMingle session and
 # redirect the user back to the main homepage in app.py.
