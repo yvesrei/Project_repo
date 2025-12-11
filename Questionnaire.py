@@ -45,7 +45,7 @@ def show_questionnaire():
         )
 
 
-        # This is a multiselect button, eg. the participant is able to choose 3 different type of cuisines.
+        # This is a multiselect button, so the participant is able to choose 3 different type of cuisines.
         # The maximum number of selected types of cuisines is set to 3.
         # Gets stored in the personal key.
         # The ranking section only activates if exactly 3 cuisines have been selected.
