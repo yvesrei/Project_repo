@@ -40,7 +40,7 @@ def show_homepage():
     if st.button("Set up meal"):
         if num_of_part is None:
                 st.warning("Please select a number of participants for your meal")
-                st.stop
+                st.stop()
         else:
                 st.session_state["page"] = "questionnaire"
                 st.rerun()
