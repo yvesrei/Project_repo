@@ -3,7 +3,7 @@ import streamlit as st
 
 def show_about_us():
     st.title("About Us")
-    st.subheader("Meet the FOODMINGLE Team!")
+    st.subheader("Meet the FOODMINGLE Team")
 
     # ---- Group section ----
     
