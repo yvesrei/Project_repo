@@ -26,4 +26,10 @@ Project_repo/
 │   └── sample_api_data.json   # Local fallback for testing API logic
 │
 ├── requirements.txt           # Python + Streamlit dependencies
+├── theme-info.txt             # Documentation of our custom Streamlit theme
 └── README.md                  # Project documentation
+
+About the Theme (config.toml):
+We created a custom Streamlit theme for the app.
+To avoid any risk of breaking the working project during submission, we did not include the active config.toml file.
+Instead, we provide theme-info.txt, which contains the full theme configuration for documentation purposes as well as further explanation.
