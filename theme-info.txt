@@ -1,0 +1,111 @@
+This file documents the custom Streamlit theme (config.toml) created for the
+FoodMingle application.
+
+This file defines the visual design of the FoodMingle app.
+We started from a default Streamlit theme that we copied and adapted the colors,
+fonts, and layout to match our custom Bordeaux/dark aesthetic.
+
+We decided not to include the actual config.toml in
+the submitted ZIP, because Streamlit requires the file to be placed in a very 
+specific directory structure (.streamlit/config.toml). Adding it incorrectly 
+might break the project or prevent the app from starting.
+
+Since the application currently runs perfectly and reliably without the theme
+file, we chose to provide the theme as documentation only, instead of risking
+the stability of the working project.
+
+Below is the complete theme configuration exactly as it would appear in a
+config.toml file:
+
+
+
+# Streamlit theme configuration
+# ------------------------------------------------------------------------
+# This file defines the visual design of the FoodMingle app.
+# We started from a default Streamlit theme that we copied and adapted the colors,
+# fonts, and layout to match our custom Bordeaux/dark aesthetic.
+# ========================================================================
+
+[server]
+enableStaticServing = true
+
+# ==========================
+#        FONTS
+# ==========================
+# Custom fonts used throughout the app. These files are stored locally
+# in the /app/static directory and applied globally via Streamlit theming.
+
+[[theme.fontFaces]]
+family = "SpaceGrotesk"
+url = "app/static/SpaceGrotesk-VariableFont_wght.ttf"
+
+[[theme.fontFaces]]
+family = "SpaceMono"
+url = "app/static/SpaceMono-Bold.ttf"
+style = "normal"
+weight = 700
+
+[[theme.fontFaces]]
+family = "SpaceMono"
+url = "app/static/SpaceMono-BoldItalic.ttf"
+style = "italic"
+weight = 700
+
+[[theme.fontFaces]]
+family = "SpaceMono"
+url = "app/static/SpaceMono-Italic.ttf"
+style = "italic"
+weight = 400
+
+[[theme.fontFaces]]
+family = "SpaceMono"
+url = "app/static/SpaceMono-Regular.ttf"
+style = "normal"
+weight = 400
+
+# ==========================
+#        THEME
+# ==========================
+# Main theme settings for the entire app that includes:
+# - Custom Bordeaux color palette
+# - Rounded components
+# - Typography configuration
+# - Chart colors
+
+[theme]
+# --- Color Palette ---
+primaryColor = "#6A0F19"              # Bordeaux accent
+backgroundColor = "#3A0F14"           # Dark Bordeaux background
+secondaryBackgroundColor = "#1C1C1C"  # Dark grey panels
+textColor = "#F5F5F5"                 # White/light text
+linkColor = "#C0464C"                 # Soft Bordeaux link highlight
+borderColor = "#2A2A2A"               # Dark grey borders
+
+# --- Layout Styling ---
+showWidgetBorder = true
+baseRadius = "0.75rem"
+buttonRadius = "full"
+
+# --- Typography ---
+font = "SpaceGrotesk"
+headingFontWeights = [600,500,500,500,500,500]
+headingFontSizes = ["3rem", "2rem"]
+codeFont = "SpaceMono"
+codeFontSize = ".75rem"
+codeBackgroundColor = "#2D2D2D"
+
+showSidebarBorder = true
+
+# --- Charts ---
+chartCategoricalColors = ["#0ea5e9", "#059669", "#fbbf24"]
+
+# ==========================
+#      SIDEBAR THEME
+# ==========================
+# The sidebar uses slightly darker tones to distinguish it from the main layout.
+
+[theme.sidebar]
+backgroundColor = "#300D12"                 # Darker Bordeaux tone
+secondaryBackgroundColor = "#1C1C1C"        # Dark grey
+headingFontSizes = ["1.6rem", "1.4rem", "1.2rem"]
+dataframeHeaderBackgroundColor = "#262626"
