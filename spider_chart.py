@@ -434,7 +434,7 @@ def group_taste_profile(answers):
      ## IMPORTANCE BAR CHART
     st.subheader("Importance Distribution")
      
-     # Create a small table showing the average importance value
+     # Create a small table showing the average importance value of each attribute of the group
      # for each category (1 = low importance, 3 = high importance)
     df_radar = pd.DataFrame({
         "category": ["Budget", "Cuisine", "Walking Distance"],
@@ -456,6 +456,7 @@ def group_taste_profile(answers):
         color=alt.Color("category:N") # same color for category and legend
     )
      # Show the chart in Streamlit
+     # Sets width that it fits exactly the full available width of the page.
     st.altair_chart(chart, use_container_width=True)
 
     st.markdown("---")
@@ -506,8 +507,8 @@ def group_taste_profile(answers):
 
      # Build a dictionary that sums up all importance values per distance
      # Example:
-     #   5 → 6 importance points
-     #   10 → 9 importance points
+     #   5 -> 6 importance points
+     #   10 -> 9 importance points
     for p in answers:
         minutes = DISTANCE_TO_MINUTES[p["walking_distance"]]
         weight = p["walking_distance_importance"]
@@ -523,9 +524,9 @@ def group_taste_profile(answers):
 
      # Create a pie chart showing how the importance is distributed
     walk_pie = alt.Chart(df_walk).mark_arc().encode(
-        theta="Weighted Importance:Q", # angle = importance weight
-        color="Walking Minutes:N",     # color-coded by distance option = altair automatically chooses different colours
-        tooltip=["Walking Minutes:N", "Weighted Importance:Q"]
+        theta="Weighted Importance:Q", # angle = importance weight = size of piece
+        color="Walking Minutes:N",     # color is coded by distance option = altair automatically chooses different colours
+        tooltip=["Walking Minutes:N", "Weighted Importance:Q"] # Which information gets shown when user hovers over slice
     )
     st.altair_chart(walk_pie, use_container_width=True)
 
