@@ -11,7 +11,7 @@ def show_questionnaire():
          # - His three cuisine preferences and ranks them by importance
          # - His walking distance preference
          # - His importance ranking of the three attributes
-         # Their answers get stored individually in the st.session_state
+         # Hheir answers get stored individually in the st.session_state
          
 
          ## Title displays which participant is currently answering the questionnaire.
