@@ -103,7 +103,7 @@ DATA_FILE = Path("group_profiles.csv")
 
 
 
- ## Define ML group feature vector function
+ ## ML group feature vector function
  # We combine:
  # - average group budget (numeric)
  # - average taste values
@@ -142,7 +142,7 @@ def generate_synthetic_group_profiles(n=50):
     rng = np.random.default_rng(42)
     vectors = []
 
-     # Hand written archetypes !!!!!
+     # Hand written archetypes!
      # [budget, spice, hearty, healthy, exotic, light]
     archetypes = [
         np.array([1.5, 1.5, 4.5, 2.0, 2.0, 2.0]),  # Comfort Classics
@@ -150,7 +150,7 @@ def generate_synthetic_group_profiles(n=50):
         np.array([2.5, 1.5, 2.0, 4.5, 3.0, 4.5]),  # Fresh & Light
         np.array([3.5, 2.0, 3.0, 3.5, 3.0, 3.0]),  # Premium Gourmet
     ]
-     # Loop n times (e.g., 50 times) to generate n synthetic taste profiles
+     # Loop n times (e.g. 50 times) to generate n synthetic taste profiles
     for _ in range(n):
          # Randmoly pick one of the four predefined taste archetypes.
          # Because RNG has a fixed seed, the selection is repeatable across runs -> results are stable.
