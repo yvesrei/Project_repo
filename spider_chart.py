@@ -578,7 +578,7 @@ def group_taste_profile(answers):
             ai_summary_text = generate_group_summary(ai_input)
 
             st.subheader("AI Summary of Your Group")  # AI result headline
-            st.info(ai_summary_text)                  # Alex: show AI text in a highlighted box
+            st.info(ai_summary_text)                  # Shows AI text in a highlighted box
         except Exception as e:
             # Fallback so the app never crashes because of AI issues
             st.caption(f"(AI group summary could not be generated: {e})")
