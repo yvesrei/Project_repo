@@ -6,7 +6,7 @@ def show_about_us():
     st.subheader("Meet the FOODMINGLE Team")
 
     # ---- Group section ----
-    # Put your group photo in e.g. `images/group_photo.jpg`
+    
     st.image("Images/group_photo.jpg", use_column_width=True, caption="The FOODMINGLE team")
 
     st.markdown(
