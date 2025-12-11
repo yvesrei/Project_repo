@@ -409,7 +409,7 @@ def group_taste_profile(answers):
     group_walking_radius = sum(walking_scores) / sum(walking_weights)
     st.session_state["group_walking_radius"] = int(group_walking_radius)
 
-     # Convert meters → label (for display)
+     # Convert meters -> label (for display)
     if group_walking_radius <= 700:
         walk_label = "5 minutes"
     elif group_walking_radius <= 1150:
