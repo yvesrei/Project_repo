@@ -1,11 +1,11 @@
 import streamlit as st
 import os
 
-# Function renders the landing page (home) of the FoodMingle app.
+# Function shows the landing page (home) of the FoodMingle app.
 # It:
 # - shows the logo from the app
 # - Lets the host choose how many people will participate in the dinner and thereofe the questionnaire
-# - Provides additional navigation to the "about us" and "questionnaire" pages
+# - Provides additional navigation to the "questionnaire" page
 
 def show_homepage():
         
