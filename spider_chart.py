@@ -57,7 +57,7 @@ TASTE_MATRIX = {
 DEFAULT_TASTE = [2, 3, 3, 3, 3]
 
 
- ## Convert each participants cuisine ranking into a 5D taste vector
+ ## Define function that converts each participants cuisine ranking into a 5D taste vector
  # We combine the 3 ranked cuisines (rank1 → weight 3, rank2 → weight 2, rank3 → weight 1)
  # into a weighted average taste profile for each participant
  # Result of the shape: (spice, hearty, healthy, exotic, light) = 5 dimensions
