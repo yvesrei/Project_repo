@@ -17,6 +17,8 @@ from Show_api_results import show_api_results
 # - how many participants there are,
 # - which participant is currently answering the questionnaire,
 # - and all collected answers so far.
+# 
+# St.session_state works like a dictionary. A key only exists after you set it once.
 
 if "page" not in st.session_state:
     # First run: start the user on the home page.
@@ -49,7 +51,7 @@ else:
 
 ## 2. Page navigation (router)
 # The "page" key in session_state acts as a simple router.
-# Depending on its value, we call exactly one view function.
+# Depending on its value, we call exactly one view function that displays a page.
 # Other parts of the app (buttons, etc.) update st.session_state["page"]
 # to switch between screens.
 
